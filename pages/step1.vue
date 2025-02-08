@@ -4,7 +4,8 @@
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/">Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Day {{ parseInt(route.query.index) + 1 }} - Step 1</li>
+        <li class="breadcrumb-item">Day {{ parseInt(route.query.index) + 1 }}</li>
+        <li class="breadcrumb-item active" aria-current="page"> Step 1: Listening Practice</li>
       </ol>
     </nav>
     <audio v-if="sentence" :src="sentence.audio" controls></audio>
