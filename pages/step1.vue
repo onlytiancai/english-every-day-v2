@@ -5,20 +5,19 @@
     <p v-else>Invalid sentence index.</p>
     <audio v-if="sentence" :src="sentence.audio" controls></audio>
     <div>
-      <button @click="goHome">Home</button>
-      <button @click="goComplete">Complete</button>
+      <a href="/" class="btn btn-primary">Home</a>
+      <a href="/complete" class="btn btn-success">Complete</a>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default {
   setup() {
     const route = useRoute();
-    const router = useRouter();
     const sentence = ref(null);
 
     const fetchSentence = async (index) => {
@@ -31,18 +30,8 @@ export default {
       fetchSentence(newIndex);
     }, { immediate: true });
 
-    const goHome = () => {
-      router.push({ name: 'index' });
-    };
-
-    const goComplete = () => {
-      router.push({ name: 'complete' });
-    };
-
     return {
-      sentence,
-      goHome,
-      goComplete,
+      sentence
     };
   },
 };
