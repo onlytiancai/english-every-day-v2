@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="container">
+    <Header />
     <h1>Step 1</h1>
     <p v-if="sentence">{{ sentence.sentence }}</p>
     <p v-else>Invalid sentence index.</p>
@@ -8,14 +9,21 @@
       <a href="/" class="btn btn-primary">Home</a>
       <a href="/complete" class="btn btn-success">Complete</a>
     </div>
+    <Footer />
   </div>
 </template>
 
 <script>
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import Header from '@/components/Header.vue';
+import Footer from '@/components/Footer.vue';
 
 export default {
+  components: {
+    Header,
+    Footer,
+  },
   setup() {
     const route = useRoute();
     const sentence = ref(null);
@@ -36,3 +44,7 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+@import '@/assets/css/common.css';
+</style>
