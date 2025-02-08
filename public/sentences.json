@@ -1,0 +1,22 @@
+[
+  {
+    "sentence": "The quick brown fox jumps over the lazy dog.",
+    "audio": "/audio/quick_brown_fox.mp3",
+    "keywords": ["quick", "brown", "jumps", "lazy"],
+    "grammar": "The sentence uses the simple present tense.",
+    "related_sentences": [
+      "The fast brown fox leaps over the lazy dog.",
+      "A quick brown fox jumps over a lazy dog."
+    ]
+  },
+  {
+    "sentence": "She sells seashells by the seashore.",
+    "audio": "/audio/she_sells_seashells.mp3",
+    "keywords": ["sells", "seashells", "seashore"],
+    "grammar": "The sentence uses the simple present tense.",
+    "related_sentences": [
+      "She sells seashells near the sea.",
+      "She sells seashells at the beach."
+    ]
+  }
+]
