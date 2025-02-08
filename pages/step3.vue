@@ -11,7 +11,9 @@
     <p v-if="sentence">{{ sentence.sentence }}</p>
     <p v-else>Invalid sentence index.</p>
     <ul v-if="sentence">
-      <li v-for="word in sentence.keywords" :key="word">{{ word }}</li>
+      <li v-for="word in sentence.keywords" :key="word.word">
+        <p>{{ word.word }}, [{{ word.phonetic }}],{{ word.part_of_speech }}, {{ word.translation }}</p>
+      </li>
     </ul>
     <div style="margin-top: 20px;">
       <div class="btn-group">

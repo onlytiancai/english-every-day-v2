@@ -18,6 +18,7 @@
     </div>
     <div v-else>
       <p v-if="sentence">{{ sentence.sentence }}</p>
+      <p v-if="sentence">{{ sentence.translation }}</p> <!-- Added translation display -->
       <p v-else>Invalid sentence index.</p>
       <div style="margin-top: 20px;">
       <div class="btn-group">
