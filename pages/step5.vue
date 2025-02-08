@@ -5,7 +5,7 @@
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/">Home</a></li>
         <li class="breadcrumb-item">Day {{ parseInt(route.query.index) + 1 }}</li>
-        <li class="breadcrumb-item active" aria-current="page">Step 5: Related Sentences</li>
+        <li class="breadcrumb-item active" aria-current="page">Step 5: Extended Practice</li>
       </ol>
     </nav>
     <p v-if="sentence">{{ sentence.sentence }}</p>
@@ -52,4 +52,9 @@ export default {
 </script>
 <style scoped>
 @import '@/assets/css/common.css';
+
+
+ul {
+  text-align: left;
+}
 </style>

@@ -1,22 +1,180 @@
 [
   {
     "sentence": "The quick brown fox jumps over the lazy dog.",
+    "translation": "快速的棕色狐狸跳过懒惰的狗。",
     "audio": "/audio/quick_brown_fox.mp3",
-    "keywords": ["quick", "brown", "jumps", "lazy"],
-    "grammar": "The sentence uses the simple present tense.",
+    "keywords": [
+      { "word": "quick", "translation": "快速的", "phonetic": "kwɪk", "part_of_speech": "adjective" },
+      { "word": "brown", "translation": "棕色的", "phonetic": "braʊn", "part_of_speech": "adjective" },
+      { "word": "jumps", "translation": "跳跃", "phonetic": "dʒʌmps", "part_of_speech": "verb" },
+      { "word": "lazy", "translation": "懒惰的", "phonetic": "ˈleɪzi", "part_of_speech": "adjective" }
+    ],
+    "grammar": "这句话使用的是一般现在时，描述的是一个经常发生的动作。",
     "related_sentences": [
       "The fast brown fox leaps over the lazy dog.",
-      "A quick brown fox jumps over a lazy dog."
+      "A quick brown fox jumps over a lazy dog.",
+      "The agile brown fox jumps over the lazy dog."
     ]
   },
   {
     "sentence": "She sells seashells by the seashore.",
+    "translation": "她在海岸边卖海贝壳。",
     "audio": "/audio/she_sells_seashells.mp3",
-    "keywords": ["sells", "seashells", "seashore"],
-    "grammar": "The sentence uses the simple present tense.",
+    "keywords": [
+      { "word": "sells", "translation": "卖", "phonetic": "sɛlz", "part_of_speech": "verb" },
+      { "word": "seashells", "translation": "海贝壳", "phonetic": "ˈsiːˌʃɛlz", "part_of_speech": "noun" },
+      { "word": "seashore", "translation": "海岸", "phonetic": "ˈsiːˌʃɔːr", "part_of_speech": "noun" }
+    ],
+    "grammar": "这句话使用的是一般现在时，描述的是一个经常发生的动作。",
     "related_sentences": [
       "She sells seashells near the sea.",
-      "She sells seashells at the beach."
+      "She sells seashells at the beach.",
+      "She sells seashells along the coast."
+    ]
+  },
+  {
+    "sentence": "The cat, which had been sitting on the mat all day, suddenly jumped up when it heard a noise outside the window.",
+    "translation": "那只整天坐在垫子上的猫，听到窗外的声音时突然跳了起来。",
+    "audio": "/audio/cat_sits_on_mat.mp3",
+    "keywords": [
+      { "word": "cat", "translation": "猫", "phonetic": "kæt", "part_of_speech": "noun" },
+      { "word": "sitting", "translation": "坐", "phonetic": "ˈsɪtɪŋ", "part_of_speech": "verb" },
+      { "word": "mat", "translation": "垫子", "phonetic": "mæt", "part_of_speech": "noun" },
+      { "word": "jumped", "translation": "跳", "phonetic": "dʒʌmpt", "part_of_speech": "verb" },
+      { "word": "noise", "translation": "声音", "phonetic": "nɔɪz", "part_of_speech": "noun" },
+      { "word": "window", "translation": "窗户", "phonetic": "ˈwɪndoʊ", "part_of_speech": "noun" }
+    ],
+    "grammar": "这句话使用了过去完成进行时和过去时，描述了一个过去的动作和一个过去的状态。",
+    "related_sentences": [
+      "The dog, which had been lying on the mat, barked loudly when it saw a stranger.",
+      "The bird, which had been perched on the branch, flew away when the cat approached.",
+      "The child, who had been playing in the yard, ran inside when it started to rain."
+    ]
+  },
+  {
+    "sentence": "If I had known you were coming, I would have baked a cake, but now it's too late.",
+    "translation": "如果我知道你要来，我会烤一个蛋糕，但现在已经太晚了。",
+    "audio": "/audio/birds_fly_in_sky.mp3",
+    "keywords": [
+      { "word": "known", "translation": "知道", "phonetic": "noʊn", "part_of_speech": "verb" },
+      { "word": "coming", "translation": "来", "phonetic": "ˈkʌmɪŋ", "part_of_speech": "verb" },
+      { "word": "baked", "translation": "烤", "phonetic": "beɪkt", "part_of_speech": "verb" },
+      { "word": "cake", "translation": "蛋糕", "phonetic": "keɪk", "part_of_speech": "noun" },
+      { "word": "late", "translation": "晚", "phonetic": "leɪt", "part_of_speech": "adjective" }
+    ],
+    "grammar": "这句话使用了虚拟语气，描述了一个与过去事实相反的假设。",
+    "related_sentences": [
+      "If she had studied harder, she would have passed the exam, but she didn't.",
+      "If they had left earlier, they would have caught the train, but they were late.",
+      "If we had saved more money, we could have bought a bigger house, but we didn't."
+    ]
+  },
+  {
+    "sentence": "The book that you lent me last week was so interesting that I couldn't put it down until I finished it.",
+    "translation": "你上周借给我的那本书太有趣了，我一口气读完了。",
+    "audio": "/audio/sun_rises_in_east.mp3",
+    "keywords": [
+      { "word": "book", "translation": "书", "phonetic": "bʊk", "part_of_speech": "noun" },
+      { "word": "lent", "translation": "借", "phonetic": "lɛnt", "part_of_speech": "verb" },
+      { "word": "interesting", "translation": "有趣的", "phonetic": "ˈɪntrəstɪŋ", "part_of_speech": "adjective" },
+      { "word": "finished", "translation": "完成", "phonetic": "ˈfɪnɪʃt", "part_of_speech": "verb" }
+    ],
+    "grammar": "这句话使用了定语从句和结果状语从句，描述了一个过去的动作和结果。",
+    "related_sentences": [
+      "The movie that we watched last night was so boring that I fell asleep.",
+      "The meal that he cooked for us was so delicious that we ate it all.",
+      "The story that she told me was so funny that I couldn't stop laughing."
+    ]
+  },
+  {
+    "sentence": "Despite the fact that it was raining heavily, they decided to go for a hike in the mountains.",
+    "translation": "尽管下着大雨，他们还是决定去山里徒步。",
+    "audio": "/audio/stars_shine_at_night.mp3",
+    "keywords": [
+      { "word": "despite", "translation": "尽管", "phonetic": "dɪˈspaɪt", "part_of_speech": "preposition" },
+      { "word": "raining", "translation": "下雨", "phonetic": "ˈreɪnɪŋ", "part_of_speech": "verb" },
+      { "word": "heavily", "translation": "大雨", "phonetic": "ˈhɛvɪli", "part_of_speech": "adverb" },
+      { "word": "decided", "translation": "决定", "phonetic": "dɪˈsaɪdɪd", "part_of_speech": "verb" },
+      { "word": "hike", "translation": "徒步", "phonetic": "haɪk", "part_of_speech": "noun" },
+      { "word": "mountains", "translation": "山", "phonetic": "ˈmaʊntənz", "part_of_speech": "noun" }
+    ],
+    "grammar": "这句话使用了让步状语从句，描述了一个与预期相反的动作。",
+    "related_sentences": [
+      "Despite the fact that it was snowing, they went skiing.",
+      "Despite the fact that it was late, they continued working.",
+      "Despite the fact that it was hot, they went for a run."
+    ]
+  },
+  {
+    "sentence": "He must have been very tired, for he fell asleep as soon as he lay down on the bed.",
+    "translation": "他一定是非常累了，因为他一躺在床上就睡着了。",
+    "audio": "/audio/flowers_bloom_in_spring.mp3",
+    "keywords": [
+      { "word": "must", "translation": "一定", "phonetic": "mʌst", "part_of_speech": "modal verb" },
+      { "word": "tired", "translation": "累", "phonetic": "ˈtaɪərd", "part_of_speech": "adjective" },
+      { "word": "asleep", "translation": "睡着", "phonetic": "əˈsliːp", "part_of_speech": "adjective" },
+      { "word": "lay", "translation": "躺", "phonetic": "leɪ", "part_of_speech": "verb" },
+      { "word": "bed", "translation": "床", "phonetic": "bɛd", "part_of_speech": "noun" }
+    ],
+    "grammar": "这句话使用了情态动词和原因状语从句，描述了一个推测和结果。",
+    "related_sentences": [
+      "She must have been hungry, for she ate everything on her plate.",
+      "They must have been lost, for they asked for directions.",
+      "He must have been cold, for he put on a jacket."
+    ]
+  },
+  {
+    "sentence": "What a beautiful day it is! I wish we could spend it at the beach instead of being stuck in the office.",
+    "translation": "多么美好的一天啊！我希望我们能在海滩上度过，而不是困在办公室里。",
+    "audio": "/audio/leaves_fall_in_autumn.mp3",
+    "keywords": [
+      { "word": "beautiful", "translation": "美好", "phonetic": "ˈbjuːtɪfəl", "part_of_speech": "adjective" },
+      { "word": "spend", "translation": "度过", "phonetic": "spɛnd", "part_of_speech": "verb" },
+      { "word": "beach", "translation": "海滩", "phonetic": "biːtʃ", "part_of_speech": "noun" },
+      { "word": "stuck", "translation": "困住", "phonetic": "stʌk", "part_of_speech": "adjective" },
+      { "word": "office", "translation": "办公室", "phonetic": "ˈɔːfɪs", "part_of_speech": "noun" }
+    ],
+    "grammar": "这句话使用了感叹句和虚拟语气，表达了一个愿望和现实的对比。",
+    "related_sentences": [
+      "What a wonderful surprise it was! I wish you could have been there.",
+      "What an amazing view it is! I wish we could stay here longer.",
+      "What a delicious meal it was! I wish I could eat it again."
+    ]
+  },
+  {
+    "sentence": "The project, which had been delayed several times due to unforeseen circumstances, was finally completed last week.",
+    "translation": "由于不可预见的情况，该项目被多次推迟，终于在上周完成了。",
+    "audio": "/audio/snow_falls_in_winter.mp3",
+    "keywords": [
+      { "word": "project", "translation": "项目", "phonetic": "ˈprɒdʒɛkt", "part_of_speech": "noun" },
+      { "word": "delayed", "translation": "推迟", "phonetic": "dɪˈleɪd", "part_of_speech": "verb" },
+      { "word": "unforeseen", "translation": "不可预见的", "phonetic": "ˌʌnfɔːrˈsiːn", "part_of_speech": "adjective" },
+      { "word": "circumstances", "translation": "情况", "phonetic": "ˈsɜːrkəmstænsɪz", "part_of_speech": "noun" },
+      { "word": "completed", "translation": "完成", "phonetic": "kəmˈpliːtɪd", "part_of_speech": "verb" }
+    ],
+    "grammar": "这句话使用了定语从句和过去完成时，描述了一个过去的动作和结果。",
+    "related_sentences": [
+      "The event, which had been planned for months, was a huge success.",
+      "The building, which had been under construction for years, was finally opened.",
+      "The book, which had been written over a decade, was published last year."
+    ]
+  },
+  {
+    "sentence": "By the time we arrived at the station, the train had already left, so we had to wait for the next one.",
+    "translation": "当我们到达车站时，火车已经离开了，所以我们不得不等下一班。",
+    "audio": "/audio/wind_blows_in_trees.mp3",
+    "keywords": [
+      { "word": "arrived", "translation": "到达", "phonetic": "əˈraɪvd", "part_of_speech": "verb" },
+      { "word": "station", "translation": "车站", "phonetic": "ˈsteɪʃən", "part_of_speech": "noun" },
+      { "word": "train", "translation": "火车", "phonetic": "treɪn", "part_of_speech": "noun" },
+      { "word": "left", "translation": "离开", "phonetic": "lɛft", "part_of_speech": "verb" },
+      { "word": "wait", "translation": "等", "phonetic": "weɪt", "part_of_speech": "verb" }
+    ],
+    "grammar": "这句话使用了过去完成时和过去时，描述了一个过去的动作和结果。",
+    "related_sentences": [
+      "By the time she got home, the guests had already left, so she missed the party.",
+      "By the time he finished his work, the office had already closed, so he had to leave.",
+      "By the time they reached the airport, the plane had already taken off, so they missed their flight."
     ]
   }
 ]

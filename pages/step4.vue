@@ -5,12 +5,12 @@
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/">Home</a></li>
         <li class="breadcrumb-item">Day {{ parseInt(route.query.index) + 1 }}</li>
-        <li class="breadcrumb-item active" aria-current="page">Step 4: Key Grammar</li>
+        <li class="breadcrumb-item active" aria-current="page">Step 4: Grammar Study</li>
       </ol>
     </nav>
     <p v-if="sentence">{{ sentence.sentence }}</p>
     <p v-else>Invalid sentence index.</p>
-    <p v-if="sentence">{{ sentence.grammar }}</p>
+    <p v-if="sentence" style="text-align: left;">{{ sentence.grammar }}</p>
     <div style="margin-top: 20px;">
       <div class="btn-group">
         <a :href="`/step5?index=${route.query.index}`" class="btn btn-primary">Next</a>

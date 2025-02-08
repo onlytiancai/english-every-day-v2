@@ -19,13 +19,14 @@
     <div v-else>
       <p v-if="sentence">{{ sentence.sentence }}</p>
       <p v-else>Invalid sentence index.</p>
-    </div>
-    <div style="margin-top: 20px;">
+      <div style="margin-top: 20px;">
       <div class="btn-group">
         <a :href="`/step2?index=${route.query.index}`" class="btn btn-primary">Next</a>
         <a href="/complete" class="btn btn-outline-primary">Complete</a>
       </div>
     </div>
+    </div>
+  
     <Footer />
   </div>
 </template>
