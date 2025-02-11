@@ -1,6 +1,8 @@
 <template>
   <div class="container">
     <Header />
+    <div>
+      <a :href="debugstr">{{debugstr}}</a></div>
     <ul class="icon-list">
       <li v-for="(sentence, index) in sentences" :key="index">
         <router-link :to="{ name: 'step1', query: { index: index.toString() } }" class="styled-link">
@@ -13,33 +15,28 @@
   </div>
 </template>
 
-<script>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+<script setup>
 import { CheckCircleOutlined } from '@ant-design/icons-vue';
-import Header from '@/components/Header.vue';
-import Footer from '@/components/Footer.vue';
+import { useRuntimeConfig } from '#imports';
 
-export default {
-  components: {
-    CheckCircleOutlined,
-    Header,
-    Footer,
-  },
-  setup() {
-    const sentences = ref([]);
-    const router = useRouter();
+const sentences = ref([]);
+const debugstr = ref('')
+const config = useRuntimeConfig();
 
-    onMounted(async () => {
-      const response = await fetch('/sentences.json');
-      sentences.value = await response.json();
-    });
+const isWeChat = typeof navigator !== 'undefined' && /MicroMessenger/i.test(navigator.userAgent);
 
-    return {
-      sentences,
-    };
-  },
-};
+onMounted(async () => {
+  if (isWeChat) {
+    const wechatAppId = config.public.wechatAppId;
+    const redirectUri = encodeURIComponent(window.location.href);
+    const wechatAuthUrl = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${wechatAppId}&redirect_uri=${redirectUri}&response_type=code&scope=snsapi_userinfo#wechat_redirect`;
+    debugstr.value = wechatAuthUrl
+    //window.location.href = wechatAuthUrl;
+  } else {
+    const response = await fetch('/sentences.json');
+    sentences.value = await response.json();
+  }
+});
 </script>
 
 <style scoped>

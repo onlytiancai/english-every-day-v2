@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   modules: [
     '@ant-design-vue/nuxt'
   ],
-  antd:{
+  antd: {
     // Options
   },
   compatibilityDate: '2024-11-01',
@@ -13,5 +13,14 @@ export default defineNuxtConfig({
   pages: true,
   css: [
     'bootstrap/dist/css/bootstrap.min.css'
-  ]
+  ],
+  runtimeConfig: {
+    public: {
+      wechatAppId: process.env.WECHAT_APP_ID,
+    },
+    wechatAppSecret: process.env.WECHAT_APP_SECRET,
+  },
+  server: {
+    host: '0.0.0.0'
+  }
 });
