@@ -2,7 +2,13 @@
   <div class="container">
     <Header />
     <div>
-      <a :href="debugstr">{{debugstr}}</a></div>
+      <a :href="loginWechatUrl">微信登录</a>
+      {{  loginWechatUrl}}
+    </div>
+    <div v-if="userInfo">
+      <img :src="userInfo.headimgurl" alt="WeChat Avatar" />
+      <p>{{ userInfo.nickname }}</p>
+    </div>
     <ul class="icon-list">
       <li v-for="(sentence, index) in sentences" :key="index">
         <router-link :to="{ name: 'step1', query: { index: index.toString() } }" class="styled-link">
@@ -19,19 +25,19 @@
 import { CheckCircleOutlined } from '@ant-design/icons-vue';
 import { useRuntimeConfig } from '#imports';
 
+const loginWechatUrl = ref('');
 const sentences = ref([]);
-const debugstr = ref('')
 const config = useRuntimeConfig();
+const userInfo = ref(null);
 
 const isWeChat = typeof navigator !== 'undefined' && /MicroMessenger/i.test(navigator.userAgent);
 
 onMounted(async () => {
   if (isWeChat) {
     const wechatAppId = config.public.wechatAppId;
-    const redirectUri = encodeURIComponent(window.location.href);
+    const redirectUri = encodeURIComponent(window.location.href + 'wechat-callback');
     const wechatAuthUrl = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${wechatAppId}&redirect_uri=${redirectUri}&response_type=code&scope=snsapi_userinfo#wechat_redirect`;
-    debugstr.value = wechatAuthUrl
-    //window.location.href = wechatAuthUrl;
+    loginWechatUrl.value = wechatAuthUrl;
   } else {
     const response = await fetch('/sentences.json');
     sentences.value = await response.json();

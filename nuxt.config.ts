@@ -15,12 +15,10 @@ export default defineNuxtConfig({
     'bootstrap/dist/css/bootstrap.min.css'
   ],
   runtimeConfig: {
+    wechatAppId: process.env.WECHAT_APP_ID,
+    wechatAppSecret: process.env.WECHAT_APP_SECRET,
     public: {
       wechatAppId: process.env.WECHAT_APP_ID,
-    },
-    wechatAppSecret: process.env.WECHAT_APP_SECRET,
-  },
-  server: {
-    host: '0.0.0.0'
+    }
   }
 });
