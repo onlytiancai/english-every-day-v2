@@ -1,6 +1,5 @@
 <template>
-  <div class="container">
-    <Header />
+  <div >
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -19,18 +18,14 @@
         <a :href="`/step4?index=${route.query.index}`" class="btn btn-outline-primary">Previous</a>
       </div>
     </div>
-    <Footer />
   </div>
 </template>
 <script>
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import Header from '@/components/Header.vue';
-import Footer from '@/components/Footer.vue';
 export default {
   components: {
-    Header,
-    Footer,
+
   },
   setup() {
     const route = useRoute();
@@ -51,7 +46,6 @@ export default {
 };
 </script>
 <style scoped>
-@import '@/assets/css/common.css';
 
 
 ul {

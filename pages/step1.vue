@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <Header />
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -27,8 +26,6 @@
       </div>
     </div>
     </div>
-  
-    <Footer />
   </div>
 </template>
 
@@ -81,7 +78,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-@import '@/assets/css/common.css';
-</style>

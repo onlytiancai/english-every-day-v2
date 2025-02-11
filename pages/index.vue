@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <Header />
     <div v-if="isWeChat">
       <div v-if="!userInfo">
         <a :href="loginWechatUrl">微信登录</a>
@@ -28,7 +27,6 @@
         <li v-for="(message, index) in debugMessages" :key="index">{{ message }}</li>
       </ul>
     </div>
-    <Footer />
   </div>
 </template>
 
@@ -36,6 +34,7 @@
 import { CheckCircleOutlined } from '@ant-design/icons-vue';
 import { useRuntimeConfig } from '#imports';
 import { useRoute, useRouter } from 'vue-router';
+import { fetchSentences } from '@/utils/fetchSentences';
 
 const loginWechatUrl = ref('');
 const sentences = ref([]);
@@ -65,15 +64,7 @@ onMounted(async () => {
 
   if (token && storedUserInfo) {
     try {
-      const sentencesResponse = await fetch('/api/sentences', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      logDebug(`get sentences 1: status=${sentencesResponse.status}`);
-      if (sentencesResponse.ok) {
-        sentences.value = await sentencesResponse.json();
-      } else {
-        throw new Error('Token invalid');
-      }
+      sentences.value = await fetchSentences(token);
     } catch (error) {
       logDebug(`Fetching sentences error: ${error}`);
       localStorage.removeItem('token');
@@ -91,11 +82,7 @@ onMounted(async () => {
         userInfo.value = data.userInfo;
         localStorage.setItem('token', data.token);
         localStorage.setItem('userInfo', JSON.stringify(data.userInfo));
-        const sentencesResponse = await fetch('/api/sentences', {
-          headers: { 'Authorization': `Bearer ${data.token}` }
-        });
-        logDebug(`get sentences: status=${sentencesResponse.status}`);
-        sentences.value = await sentencesResponse.json();
+        sentences.value = await fetchSentences(data.token);
       } else {
         errorMessage.value = data.error;
       }
@@ -113,7 +100,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-@import '@/assets/css/common.css';
 
 .icon-list {
   list-style-type: none;
