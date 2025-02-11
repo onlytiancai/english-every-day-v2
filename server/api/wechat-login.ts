@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   try {
     const url =`https://api.weixin.qq.com/sns/oauth2/access_token?appid=${config.wechatAppId}&secret=${config.wechatAppSecret}&code=${code}&grant_type=authorization_code`
 
-    const tokenResponse = await axios.get(url    );
+    const tokenResponse = await axios.get(url);
     console.log(url, 'Token response:', tokenResponse.data);
 
     const { access_token, openid } = tokenResponse.data;
@@ -25,6 +25,10 @@ export default defineEventHandler(async (event) => {
       `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openid}&lang=zh_CN`
     );
     console.log('User info response:', userInfoResponse.data);
+
+    if (userInfoResponse.data.errcode) {
+      return { error: userInfoResponse.data.errmsg };
+    }
 
     const userInfo = userInfoResponse.data;
 
