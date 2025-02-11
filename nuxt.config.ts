@@ -17,6 +17,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     wechatAppId: process.env.WECHAT_APP_ID,
     wechatAppSecret: process.env.WECHAT_APP_SECRET,
+    jwtSecret: process.env.JWT_SECRET,
     public: {
       wechatAppId: process.env.WECHAT_APP_ID,
     }

@@ -1,5 +1,6 @@
 import { defineEventHandler, getQuery } from 'h3';
 import axios from 'axios';
+import jwt from 'jsonwebtoken';
 
 export default defineEventHandler(async (event) => {
   console.log('wechat-login API triggered');
@@ -32,7 +33,10 @@ export default defineEventHandler(async (event) => {
 
     const userInfo = userInfoResponse.data;
 
-    return { success: true, userInfo };
+    // Generate JWT token
+    const token = jwt.sign({ openid }, config.jwtSecret, { expiresIn: '1h' });
+
+    return { success: true, userInfo, token };
   } catch (error) {
     console.error('WeChat login error:', error);
     return { error: 'WeChat login error' };

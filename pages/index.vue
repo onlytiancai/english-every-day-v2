@@ -4,7 +4,6 @@
     <div v-if="isWeChat">
       <div v-if="!userInfo">
         <a :href="loginWechatUrl">微信登录</a>
-        {{ loginWechatUrl }}
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       </div>
       <div v-else>
@@ -23,6 +22,12 @@
     <div v-else>
       <p>请在微信中打开</p>
     </div>
+    <div v-if="debugMessages.length" class="debug-messages">
+      <h3>Debug Information</h3>
+      <ul>
+        <li v-for="(message, index) in debugMessages" :key="index">{{ message }}</li>
+      </ul>
+    </div>
     <Footer />
   </div>
 </template>
@@ -37,26 +42,65 @@ const sentences = ref([]);
 const config = useRuntimeConfig();
 const userInfo = ref(null);
 const errorMessage = ref('');
+const debugMessages = ref([]);
 const route = useRoute();
 const router = useRouter();
 
 const isWeChat = typeof navigator !== 'undefined' && /MicroMessenger/i.test(navigator.userAgent);
 
+function logDebug(message) {
+  console.log(message);
+  debugMessages.value.push(message);
+}
+
 onMounted(async () => {
   const code = route.query.code;
-  if (code) {
+  const token = localStorage.getItem('token');
+  const storedUserInfo = localStorage.getItem('userInfo');
+
+  logDebug(`index loaded: code=${code}, token=${token}, storedUserInfo=${storedUserInfo}`);
+  if (storedUserInfo) {
+    userInfo.value = JSON.parse(storedUserInfo);
+  }
+
+  if (token && storedUserInfo) {
+    try {
+      const sentencesResponse = await fetch('/api/sentences', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      logDebug(`get sentences 1: status=${sentencesResponse.status}`);
+      if (sentencesResponse.ok) {
+        sentences.value = await sentencesResponse.json();
+      } else {
+        throw new Error('Token invalid');
+      }
+    } catch (error) {
+      logDebug(`Fetching sentences error: ${error}`);
+      localStorage.removeItem('token');
+      localStorage.removeItem('userInfo');
+      userInfo.value = null;
+      errorMessage.value = 'Token invalid, please log in again';
+    }
+  } else if (code) {
+    logDebug(`enter wechat callback: code=${code}`);
     try {
       const response = await fetch(`/api/wechat-login?code=${code}`);
       const data = await response.json();
+      logDebug(`get wechat login: ${JSON.stringify(data)}`);
       if (data.success) {
         userInfo.value = data.userInfo;
-        const response = await fetch('/sentences.json');
-        sentences.value = await response.json();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userInfo', JSON.stringify(data.userInfo));
+        const sentencesResponse = await fetch('/api/sentences', {
+          headers: { 'Authorization': `Bearer ${data.token}` }
+        });
+        logDebug(`get sentences: status=${sentencesResponse.status}`);
+        sentences.value = await sentencesResponse.json();
       } else {
         errorMessage.value = data.error;
       }
     } catch (error) {
-      console.error('WeChat login error:', error);
+      logDebug(`WeChat login error: ${error}`);
       errorMessage.value = 'WeChat login error';
     }
   } else if (isWeChat) {
@@ -102,5 +146,18 @@ onMounted(async () => {
 .error-message {
   color: red;
   font-weight: bold;
+}
+
+.debug-messages {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-top: 20px;
+  word-wrap: break-word;
+  text-align: left;
+}
+
+.debug-messages h3 {
+  margin-top: 0;
 }
 </style>
