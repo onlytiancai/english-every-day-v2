@@ -1,0 +1,90 @@
+# Cursor Rules for English Every Day Project
+
+# 文件类型规则
+*.vue linguist-language=Vue
+*.ts linguist-language=TypeScript
+*.js linguist-language=JavaScript
+*.json linguist-language=JSON
+*.css linguist-language=CSS
+
+# 代码风格
+max_line_length = 100
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# Vue 组件结构
+vue_component_order = template, script, style
+
+# TypeScript 配置
+typescript_strict = true
+typescript_target = ES2020
+
+# API 路径
+api_base_path = /api
+sentences_endpoint = /api/sentences
+wechat_login_endpoint = /api/wechat-login
+
+# 环境变量
+required_env_vars = [
+  "WECHAT_APP_ID",
+  "WECHAT_APP_SECRET",
+  "JWT_SECRET"
+]
+
+# 文件夹结构
+important_directories = [
+  "pages/",
+  "components/",
+  "server/api/",
+  "public/",
+  "utils/",
+  "assets/"
+]
+
+# 组件命名规则
+component_naming = PascalCase
+page_naming = kebab-case
+
+# 状态管理
+state_management = composables
+
+# 路由规则
+route_structure = [
+  "/",
+  "/step1",
+  "/step2",
+  "/step3",
+  "/step4",
+  "/step5",
+  "/complete",
+  "/wechat-callback"
+]
+
+# 依赖管理
+package_manager = pnpm
+node_version = ">=16.0.0"
+
+# 安全规则
+security_rules = [
+  "require_auth_for_api",
+  "validate_jwt_token",
+  "sanitize_user_input"
+]
+
+# 开发工具配置
+dev_tools = [
+  "nuxt_devtools",
+  "vue_devtools",
+  "typescript_lsp"
+]
+
+# 部署配置
+deployment = {
+  "build_command": "pnpm build",
+  "start_command": "pnpm preview",
+  "node_env": "production"
+} 
