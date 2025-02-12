@@ -19,6 +19,7 @@
     "vue-router": "latest"
   },
   "devDependencies": {
-    "@ant-design-vue/nuxt": "^1.4.6"
+    "@ant-design-vue/nuxt": "^1.4.6",
+    "@types/jsonwebtoken": "^9.0.8"
   }
 }

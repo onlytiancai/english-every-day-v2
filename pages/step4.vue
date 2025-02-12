@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -17,30 +17,12 @@
         <a href="/complete" class="btn btn-outline-primary">Complete</a>
       </div>
     </div>
-
   </div>
 </template>
-<script>
-import { ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
-export default {
-  components: {
-  },
-  setup() {
-    const route = useRoute();
-    const sentence = ref(null);
-    const fetchSentence = async (index) => {
-      const response = await fetch('/sentences.json');
-      const sentences = await response.json();
-      sentence.value = sentences[index] || null;
-    };
-    watch(() => route.query.index, (newIndex) => {
-      fetchSentence(newIndex);
-    }, { immediate: true });
-    return {
-      sentence,
-      route
-    };
-  },
-};
+
+<script setup>
+import { useSentence } from '~/composables/useSentence'
+
+const route = useRoute()
+const { sentence, loading, error } = useSentence()
 </script>
