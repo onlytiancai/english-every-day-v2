@@ -27,17 +27,19 @@
 
 ## 项目结构
 
+```
 ├── assets/
-│ └── css/ # 全局样式
-├── components/ # 可复用组件
-├── pages/ # 页面组件
-├── public/ # 静态资源
-│ ├── audio/ # 音频文件
-│ └── sentences.json # 句子数据
-├── server/ # 服务端API
-│ └── api/
-├── utils/ # 工具函数
-└── nuxt.config.ts # Nuxt配置
+│   └── css/              # 全局样式
+├── components/           # 可复用组件
+├── pages/               # 页面组件
+├── public/              # 静态资源
+│   ├── audio/           # 音频文件
+│   └── sentences.json   # 句子数据
+├── server/              # 服务端API
+│   └── api/            
+├── utils/              # 工具函数
+└── nuxt.config.ts      # Nuxt配置
+```
 
 ## 开发环境设置
 
