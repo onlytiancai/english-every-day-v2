@@ -1,5 +1,6 @@
 import { defineEventHandler, getQuery } from 'h3'
 import prisma from "~/lib/prisma";
+import _ from 'lodash'
 
 export default defineEventHandler(async (event) => {
   const method = event.method
@@ -25,28 +26,39 @@ export default defineEventHandler(async (event) => {
 
     const learningRecords = await prisma.userLearningRecord.findMany({
       where: {
-      userId,
-      learnedAt: {
-        gte: weekAgo,
-        lte: today
-      }
+        userId,
+        learnedAt: {
+          gte: weekAgo,
+          lte: today
+        }
       },
       select: {
-      learnedAt: true,
-      sentenceId: true
+        learnedAt: true,
+        sentenceId: true
       }
     })
 
-    const groupedRecords = learningRecords.reduce((acc, record) => {
-      const date = record.learnedAt.toISOString().split('T')[0]
-      if (!acc[date]) {
-      acc[date] = { learnedAt: date, _count: { sentenceId: 0 } }
-      }
-      acc[date]._count.sentenceId += 1
-      return acc
-    }, {} as Record<string, { learnedAt: string; _count: { sentenceId: number } }>)
+    interface LearningRecord {
+      learnedAt: Date;
+      sentenceId: number;
+    }
 
-    const learningStats = Object.values(groupedRecords)
+    interface GroupedRecord {
+      learnedAt: string;
+      _count: {
+      sentenceId: number;
+      };
+    }
+
+    const groupedRecords: GroupedRecord[] = _.chain(learningRecords as LearningRecord[])
+      .groupBy((record: LearningRecord) => record.learnedAt.toISOString().split('T')[0])
+      .map((records: LearningRecord[], date: string): GroupedRecord => ({
+      learnedAt: date,
+      _count: { sentenceId: records.length }
+      }))
+      .value();
+
+    const learningStats = groupedRecords
 
     return learningStats
   }

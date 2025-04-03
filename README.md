@@ -93,9 +93,9 @@ pnpm preview
 
 MIT License
 
-## prisma
+## other
 
-相关代码
+prisma
 
     npx prisma migrate dev --name "add_some_tables"
 
@@ -103,3 +103,8 @@ MIT License
     http://localhost:5560
 
     npx prisma generate
+
+pnpm
+
+    pnpm add lodash
+    pnpm add -D @types/lodash
