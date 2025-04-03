@@ -10,3 +10,6 @@ This project is a Nuxt3 project using TypeScript, Vue3, Prisma, and TailwindCSS.
 - Prisma
 - TailwindCSS
 
+## database access
+- prisma schema path: prisma\schema.prisma
+- access database refer to server\api\user.ts

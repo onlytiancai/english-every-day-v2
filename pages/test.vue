@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data } = await useFetch('/api/user')
+const { data } = await useFetch('/api/learnings')
 
 async function handleFormSubmit() {
   const res = await $fetch('/api/submit', {

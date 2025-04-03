@@ -1,28 +1,76 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  password String?
-  posts    Post[]
+generator client {
+  provider = "prisma-client-js"
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Learning records
+  learningRecords UserLearningRecord[]
+  
+  // Likes
+  givenLikes     DailyLike[]  @relation("LikeGiver")
+  receivedLikes  DailyLike[]  @relation("LikeReceiver")
+  
+  // Follows
+  following      Follow[]      @relation("Follower")
+  followers      Follow[]      @relation("Following")
+}
+
+model Sentence {
+  id        Int      @id @default(autoincrement())
+  content   String
+  meaning   String
+  createdAt DateTime @default(now())
+  
+  learningRecords UserLearningRecord[]
+}
+
+model UserLearningRecord {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  sentenceId Int
+  learnedAt  DateTime @default(now())
+  
+  user     User     @relation(fields: [userId], references: [id])
+  sentence Sentence @relation(fields: [sentenceId], references: [id])
+
+  @@index([userId, learnedAt])
+}
+
+model DailyLike {
+  id          Int      @id @default(autoincrement())
+  giverId     Int
+  receiverId  Int
+  likedAt     DateTime @default(now())
+  
+  giver    User     @relation("LikeGiver", fields: [giverId], references: [id])
+  receiver User     @relation("LikeReceiver", fields: [receiverId], references: [id])
+
+  @@unique([giverId, receiverId, likedAt])
+  @@index([receiverId, likedAt])
+}
+
+model Follow {
+  id          Int      @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  createdAt   DateTime @default(now())
+  
+  follower  User     @relation("Follower", fields: [followerId], references: [id])
+  following User     @relation("Following", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
 }

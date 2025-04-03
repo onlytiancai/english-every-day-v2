@@ -92,3 +92,14 @@ pnpm preview
 ## 许可证
 
 MIT License
+
+## prisma
+
+相关代码
+
+    npx prisma migrate dev --name "add_some_tables"
+
+    npx prisma studio
+    http://localhost:5560
+
+    npx prisma generate
