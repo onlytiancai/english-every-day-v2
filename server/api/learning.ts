@@ -23,19 +23,30 @@ export default defineEventHandler(async (event) => {
     const weekAgo = new Date(today)
     weekAgo.setDate(weekAgo.getDate() - 7)
 
-    const learningStats = await prisma.userLearningRecord.groupBy({
-      by: ['learnedAt'],
+    const learningRecords = await prisma.userLearningRecord.findMany({
       where: {
-        userId,
-        learnedAt: {
-          gte: weekAgo,
-          lte: today
-        }
+      userId,
+      learnedAt: {
+        gte: weekAgo,
+        lte: today
+      }
       },
-      _count: {
-        sentenceId: true
+      select: {
+      learnedAt: true,
+      sentenceId: true
       }
     })
+
+    const groupedRecords = learningRecords.reduce((acc, record) => {
+      const date = record.learnedAt.toISOString().split('T')[0]
+      if (!acc[date]) {
+      acc[date] = { learnedAt: date, _count: { sentenceId: 0 } }
+      }
+      acc[date]._count.sentenceId += 1
+      return acc
+    }, {} as Record<string, { learnedAt: string; _count: { sentenceId: number } }>)
+
+    const learningStats = Object.values(groupedRecords)
 
     return learningStats
   }
