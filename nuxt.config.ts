@@ -3,7 +3,8 @@ import { defineNuxtConfig } from 'nuxt/config';
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
-    '@ant-design-vue/nuxt'
+    '@ant-design-vue/nuxt',
+    "@prisma/nuxt"
   ],
   antd: {
     // Options
