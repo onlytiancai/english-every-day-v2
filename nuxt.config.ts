@@ -21,6 +21,7 @@ export default defineNuxtConfig({
     jwtSecret: process.env.JWT_SECRET,
     public: {
       wechatAppId: process.env.WECHAT_APP_ID,
+      returnUrl: process.env.RETURN_URL,
     }
   }
 });

@@ -1,5 +1,14 @@
 <template>
-  <div class="container mx-auto p-4 space-y-8">
+  <div v-if="!isAuthenticated">
+    <div v-if="isWeChat">
+      <a :href="loginWechatUrl" class="btn btn-success btn-lg">微信登录</a>
+      <p v-if="errorMessage" class="text-danger">{{ errorMessage }}</p>
+    </div>
+    <div v-else>
+      <p class="text-center">请在微信中打开</p>
+    </div>
+  </div>
+  <div v-else class="container mx-auto p-4 space-y-8">
     <!-- Header with progress -->
     <div class="flex justify-between items-center">
       <div class="text-lg">
@@ -65,15 +74,21 @@
 </template>
 
 <script setup lang="ts">
-const router = useRouter()
-const audioPlayer = ref<HTMLAudioElement>()
-const todayLearned = ref(0)
-const showEnglish = ref(false)
-const showChinese = ref(false)
-const showExplanation = ref(false)
-const autoPlayMode = ref(false)
-const repetitionCount = ref(0)
-const sentenceCount = ref(0)
+import { isWeChat, getWechatLoginUrl, handleAuthentication } from '~/utils/auth';
+
+const route = useRoute();
+const router = useRouter();
+const audioPlayer = ref<HTMLAudioElement>();
+const todayLearned = ref(0);
+const showEnglish = ref(false);
+const showChinese = ref(false);
+const showExplanation = ref(false);
+const autoPlayMode = ref(false);
+const repetitionCount = ref(0);
+const sentenceCount = ref(0);
+const isAuthenticated = ref(false);
+const errorMessage = ref('');
+const loginWechatUrl = ref(getWechatLoginUrl());
 
 const currentSentence = ref({
   id: '',
@@ -81,61 +96,73 @@ const currentSentence = ref({
   chinese: '',
   explanation: '',
   mp3: ''
-})
+});
 
-// Fetch initial sentence and today's progress
+// Authentication check
 onMounted(async () => {
-  await fetchNewSentence()
-  await fetchTodayProgress()
-  // Auto-play audio when page loads
-  setTimeout(() => {
-    audioPlayer.value?.play()
-  }, 500)
-})
+  const { isAuthenticated: authStatus, error } = await handleAuthentication();
+  isAuthenticated.value = authStatus;
+  if (error) {
+    errorMessage.value = error;
+  }
+  if (authStatus) {
+    await fetchNewSentence();
+    await fetchTodayProgress();
+    setTimeout(() => {
+      audioPlayer.value?.play();
+    }, 500);
+  }
+});
 
 // Fetch a new random sentence
 async function fetchNewSentence() {
   try {
-    const response = await useFetch('/api/sentences/random')
+    const { getAuthHeaders } = await import('~/utils/auth');
+    const response = await useFetch('/api/sentences/random', {
+      headers: getAuthHeaders()
+    });
     if (response.data.value) {
-      currentSentence.value = response.data.value
+      currentSentence.value = response.data.value;
       // Auto-play audio after loading new sentence
       setTimeout(() => {
-        audioPlayer.value?.play()
-      }, 500)
+        audioPlayer.value?.play();
+      }, 500);
     }
   } catch (error) {
-    console.error('Error fetching sentence:', error)
+    console.error('Error fetching sentence:', error);
   }
 }
 
 // Fetch today's learning progress
 async function fetchTodayProgress() {
   try {
-    const response = await useFetch('/api/learning/today-count')
+    const { getAuthHeaders } = await import('~/utils/auth');
+    const response = await useFetch('/api/learning/today-count', {
+      headers: getAuthHeaders()
+    });
     if (response.data.value) {
-      todayLearned.value = response.data.value.count
+      todayLearned.value = response.data.value.count;
     }
   } catch (error) {
-    console.error('Error fetching progress:', error)
+    console.error('Error fetching progress:', error);
   }
 }
 
 // Handle audio playback end
 function handleAudioEnd() {
   if (autoPlayMode.value) {
-    repetitionCount.value++
+    repetitionCount.value++;
     if (repetitionCount.value >= 3) {
-      repetitionCount.value = 0
-      sentenceCount.value++
+      repetitionCount.value = 0;
+      sentenceCount.value++;
       if (sentenceCount.value < 10) {
-        nextSentence()
+        nextSentence();
       } else {
-        autoPlayMode.value = false
-        sentenceCount.value = 0
+        autoPlayMode.value = false;
+        sentenceCount.value = 0;
       }
     } else {
-      audioPlayer.value?.play()
+      audioPlayer.value?.play();
     }
   }
 }
@@ -143,34 +170,36 @@ function handleAudioEnd() {
 // Record completed sentence
 async function recordLearnedSentence() {
   try {
+    const { getAuthHeaders } = await import('~/utils/auth');
     await $fetch('/api/learning', {
       method: 'POST',
+      headers: getAuthHeaders(),
       body: {
         sentenceId: currentSentence.value.id
       }
-    })
-    todayLearned.value++
+    });
+    todayLearned.value++;
   } catch (error) {
-    console.error('Error recording learned sentence:', error)
+    console.error('Error recording learned sentence:', error);
   }
 }
 
 // Navigation and UI control functions
 function nextSentence() {
-  recordLearnedSentence()
-  fetchNewSentence()
+  recordLearnedSentence();
+  fetchNewSentence();
 }
 
 function completeLearning() {
-  recordLearnedSentence()
-  navigateHome()
+  recordLearnedSentence();
+  navigateHome();
 }
 
 function navigateHome() {
-  router.push('/')
+  router.push('/');
 }
 
-const toggleEnglish = () => showEnglish.value = !showEnglish.value
-const toggleChinese = () => showChinese.value = !showChinese.value
-const toggleExplanation = () => showExplanation.value = !showExplanation.value
+const toggleEnglish = () => showEnglish.value = !showEnglish.value;
+const toggleChinese = () => showChinese.value = !showChinese.value;
+const toggleExplanation = () => showExplanation.value = !showExplanation.value;
 </script>
