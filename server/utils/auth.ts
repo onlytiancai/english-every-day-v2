@@ -35,3 +35,18 @@ export async function generateToken(payload: JWTPayload): Promise<string> {
     expiresIn: '24h' // token 24小时有效期
   })
 }
+
+// Define the getCurrentUserId function
+export function getCurrentUserId(): number | undefined {
+  return 1
+  // Example implementation: retrieve user ID from a decoded token
+  const token = ''; // Replace with logic to get the token (e.g., from headers or cookies)
+  const config = useRuntimeConfig();
+  try {
+    const decoded = jwt.verify(token, config.jwtSecret) as JWTPayload;
+    return decoded.openid || null;
+  } catch (error) {
+    console.error('Failed to get current user ID:', error);
+    return null;
+  }
+}

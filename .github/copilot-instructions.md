@@ -16,8 +16,21 @@ This project is a Nuxt3 project using TypeScript, Vue3, Prisma, and TailwindCSS.
 
 ## UI
 
-- use @ant-design/icons-vue and bootstrap if needed
+- use @ant-design/icons-vue and bootstrap 5 if needed
 
-## database access
-- prisma schema path: prisma\schema.prisma
-- access database refer to server\api\user.ts
+## 数据库结构
+
+参考路径 prisma\schema.prisma
+
+## 常用代码
+
+获取当前用户 id
+
+    import { getCurrentUserId } from '../utils/auth';
+
+访问数据库
+
+    import prisma from "~/lib/prisma";
+    return {
+        user: await prisma.user.findFirst(),
+    };

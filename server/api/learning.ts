@@ -1,6 +1,7 @@
 import { defineEventHandler, getQuery } from 'h3'
 import prisma from "~/lib/prisma";
 import _ from 'lodash'
+import { getCurrentUserId } from '../utils/auth';
 
 export default defineEventHandler(async (event) => {
   const method = event.method
@@ -9,12 +10,14 @@ export default defineEventHandler(async (event) => {
   // Record a learned sentence
   if (method === 'POST') {
     const body = await readBody(event)
+    const userId = await getCurrentUserId(event);
+
     return await prisma.userLearningRecord.create({
       data: {
-        userId: body.userId,
-        sentenceId: body.sentenceId
+      userId: Number(userId),
+      sentenceId: Number(body.sentenceId)
       }
-    })
+    });
   }
 
   // Get user's learning statistics
