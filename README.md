@@ -102,9 +102,15 @@ prisma
     npx prisma studio
     http://localhost:5560
 
+    npx prisma migrate deploy
+
     npx prisma generate
 
 pnpm
 
     pnpm add lodash
     pnpm add -D @types/lodash
+
+gen random jwt token
+
+    openssl rand -base64 40

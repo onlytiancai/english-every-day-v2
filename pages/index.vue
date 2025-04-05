@@ -1,149 +1,149 @@
 <template>
-  <div class="container">
-    <div v-if="isWeChat">
-      <div v-if="!userInfo">
-        <a :href="loginWechatUrl">微信登录</a>
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+  <div class="container py-4">
+    <!-- Learning Status Button -->
+    <div class="text-center mb-4">
+      <button
+        @click="startLearning"
+        class="btn btn-lg px-5 py-3"
+        :class="todayCompleted ? 'btn-success' : 'btn-primary'"
+      >
+        <span class="fs-4">{{ todayCompleted ? '今日学习已完成 🎉' : '开始今日学习' }}</span>
+      </button>
+    </div>
+
+    <!-- Dashboard Stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <DashboardCard title="今日学习句子" :value="stats.todaySentences" icon="BookOutlined" />
       </div>
-      <div v-else>
-        <img :src="userInfo.headimgurl" alt="WeChat Avatar" />
-        <p>{{ userInfo.nickname }}</p>
-        <ul class="icon-list">
-          <li v-for="(sentence, index) in sentences" :key="index">
-            <router-link :to="{ name: 'step1', query: { index: index.toString() } }" class="styled-link">
-              <CheckCircleOutlined class="icon" />
-              <span class="link-text">Day {{ index + 1 }}</span>
-            </router-link>
-          </li>
-        </ul>
+      <div class="col-md-3">
+        <DashboardCard title="本周学习句子" :value="stats.weekSentences" icon="CalendarOutlined" />
+      </div>
+      <div class="col-md-3">
+        <DashboardCard title="今日获赞" :value="stats.todayLikes" icon="HeartOutlined" />
+      </div>
+      <div class="col-md-3">
+        <DashboardCard title="本周获赞" :value="stats.weekLikes" icon="LikeOutlined" />
       </div>
     </div>
-    <div v-else>
-      <p>请在微信中打开</p>
+
+    <!-- Friends List -->
+    <div class="card mb-4">
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0">好友列表</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <template v-for="friend in friends" :key="friend.id">
+            <div class="col-md-6">
+              <div class="d-flex align-items-center p-2 border rounded">
+                <img :src="friend.avatar" class="rounded-circle me-3" width="48" height="48" :alt="friend.name">
+                <div class="flex-grow-1">
+                  <h6 class="mb-0">{{ friend.name }}</h6>
+                  <small class="text-muted">
+                    今日: {{ friend.todayCount }}句 / 本周: {{ friend.weekCount }}句
+                  </small>
+                </div>
+                <div class="d-flex gap-2">
+                  <button @click="likeUser(friend.id)" class="btn btn-outline-danger btn-sm">
+                    <HeartOutlined />
+                  </button>
+                  <button @click="unfollowUser(friend.id)" class="btn btn-outline-secondary btn-sm">
+                    <UserDeleteOutlined />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
     </div>
-    <div v-if="debugMessages.length" class="debug-messages">
-      <h3>Debug Information</h3>
-      <ul>
-        <li v-for="(message, index) in debugMessages" :key="index">{{ message }}</li>
-      </ul>
+
+    <!-- Rankings -->
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header bg-light">
+            <h5 class="card-title mb-0">今日排行榜</h5>
+          </div>
+          <div class="card-body">
+            <UserRankList
+              :users="dailyRanking"
+              @like="likeUser"
+              @follow="followUser"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header bg-light">
+            <h5 class="card-title mb-0">本周排行榜</h5>
+          </div>
+          <div class="card-body">
+            <UserRankList
+              :users="weeklyRanking"
+              @like="likeUser"
+              @follow="followUser"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { CheckCircleOutlined } from '@ant-design/icons-vue';
-import { useRuntimeConfig } from '#imports';
-import { useRoute, useRouter } from 'vue-router';
-import { fetchSentences } from '@/utils/fetchSentences';
+<script setup lang="ts">
+const stats = ref({
+  todaySentences: 0,
+  weekSentences: 0,
+  todayLikes: 0,
+  weekLikes: 0
+});
 
-const loginWechatUrl = ref('');
-const sentences = ref([]);
-const config = useRuntimeConfig();
-const userInfo = ref(null);
-const errorMessage = ref('');
-const debugMessages = ref([]);
-const route = useRoute();
-const router = useRouter();
+const dailyRanking = ref([]);
+const weeklyRanking = ref([]);
+const friends = ref([]);
+const todayCompleted = ref(false);
 
-const isWeChat = typeof navigator !== 'undefined' && /MicroMessenger/i.test(navigator.userAgent);
+// Fetch initial data
+const fetchData = async () => {
+  const [statsData, dailyRank, weeklyRank, friendsData] = await Promise.all([
+    $fetch('/api/stats'),
+    $fetch('/api/ranking/daily'),
+    $fetch('/api/ranking/weekly'),
+    $fetch('/api/friends')
+  ]);
 
-function logDebug(message) {
-  console.log(message);
-  debugMessages.value.push(message);
-}
+  stats.value = statsData;
+  dailyRanking.value = dailyRank;
+  weeklyRanking.value = weeklyRank;
+  friends.value = friendsData;
+  todayCompleted.value = statsData.todaySentences > 0;
+};
 
-onMounted(async () => {
-  const code = route.query.code;
-  const token = localStorage.getItem('token');
-  const storedUserInfo = localStorage.getItem('userInfo');
+// Actions
+const startLearning = () => {
+  navigateTo('/learn');
+};
 
-  logDebug(`index loaded: code=${code}, token=${token}, storedUserInfo=${storedUserInfo}`);
-  if (storedUserInfo) {
-    userInfo.value = JSON.parse(storedUserInfo);
-  }
+const likeUser = async (userId: string) => {
+  await $fetch(`/api/users/${userId}/like`, { method: 'POST' });
+  await fetchData();
+};
 
-  if (token && storedUserInfo) {
-    try {
-      sentences.value = await fetchSentences(token);
-    } catch (error) {
-      logDebug(`Fetching sentences error: ${error}`);
-      localStorage.removeItem('token');
-      localStorage.removeItem('userInfo');
-      userInfo.value = null;
-      errorMessage.value = 'Token invalid, please log in again';
-    }
-  } else if (code) {
-    logDebug(`enter wechat callback: code=${code}`);
-    try {
-      const response = await fetch(`/api/wechat-login?code=${code}`);
-      const data = await response.json();
-      logDebug(`get wechat login: ${JSON.stringify(data)}`);
-      if (data.success) {
-        userInfo.value = data.userInfo;
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('userInfo', JSON.stringify(data.userInfo));
-        sentences.value = await fetchSentences(data.token);
-      } else {
-        errorMessage.value = data.error;
-      }
-    } catch (error) {
-      logDebug(`WeChat login error: ${error}`);
-      errorMessage.value = 'WeChat login error';
-    }
-  } else if (isWeChat) {
-    const wechatAppId = config.public.wechatAppId;
-    const redirectUri = encodeURIComponent(window.location.href);
-    const wechatAuthUrl = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${wechatAppId}&redirect_uri=${redirectUri}&response_type=code&scope=snsapi_userinfo#wechat_redirect`;
-    loginWechatUrl.value = wechatAuthUrl;
-  }
+const followUser = async (userId: string) => {
+  await $fetch(`/api/users/${userId}/follow`, { method: 'POST' });
+  await fetchData();
+};
+
+const unfollowUser = async (userId: string) => {
+  await $fetch(`/api/users/${userId}/unfollow`, { method: 'POST' });
+  await fetchData();
+};
+
+// Initial data fetch
+onMounted(() => {
+  fetchData();
 });
 </script>
-
-<style scoped>
-
-.icon-list {
-  list-style-type: none;
-  padding: 0;
-}
-
-.styled-link {
-  color: #3498db;
-  text-decoration: none;
-  font-weight: bold;
-  padding: 5px 10px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-  display: flex;
-  align-items: center;
-}
-
-.styled-link:hover {
-  background-color: #ecf0f1;
-}
-
-.icon {
-  margin-right: 8px;
-}
-
-.link-text {
-  display: inline-block;
-}
-
-.error-message {
-  color: red;
-  font-weight: bold;
-}
-
-.debug-messages {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  padding: 10px;
-  margin-top: 20px;
-  word-wrap: break-word;
-  text-align: left;
-}
-
-.debug-messages h3 {
-  margin-top: 0;
-}
-</style>
