@@ -17,6 +17,7 @@ export async function handleAuthentication() {
   const userInfoStr = localStorage.getItem('userInfo');
   const route = useRoute();
   const code = route.query.code as string;
+  const config = useRuntimeConfig();
 
   if (token && userInfoStr) {
     const userInfo = JSON.parse(userInfoStr);
@@ -25,7 +26,7 @@ export async function handleAuthentication() {
 
   if (code) {
     try {
-      const response = await fetch(`/api/wechat-login?code=${code}`);
+      const response = await fetch(`${config.public.returnUrl}api/wechat-login?code=${code}`);
       const data = await response.json();
       if (data.success) {
         localStorage.setItem('token', data.token);
