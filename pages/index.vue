@@ -1,5 +1,6 @@
 <template>
   <div class="container py-4">
+    {{ errorMessage }}
     <div v-if="!isAuthenticated">
       <a :href="loginWechatUrl" class="btn btn-success btn-lg">微信登录</a>
       <p v-if="errorMessage" class="text-danger">{{ errorMessage }}</p>
@@ -7,13 +8,18 @@
     <div v-else>
       <!-- Welcome Section -->
       <div class="card bg-light mb-4">
-        <div class="card-body d-flex align-items-center p-3">
-          <img v-if="user?.avatar" :src="user.avatar" class="rounded-circle border shadow-sm me-3" width="64"
-            height="64" :alt="user?.name">
-          <div>
-            <h2 class="h4 mb-1">欢迎回来，{{ user?.name || '同学' }}</h2>
-            <p class="text-muted mb-0">让我们继续今天的学习吧！</p>
+        <div class="card-body d-flex align-items-center justify-content-between p-3">
+          <div class="d-flex align-items-center">
+            <img v-if="user?.avatar" :src="user.avatar" class="rounded-circle border shadow-sm me-3" width="64"
+              height="64" :alt="user?.name">
+            <div>
+              <h2 class="h4 mb-1">欢迎回来，{{ user?.name || '同学' }}</h2>
+              <p class="text-muted mb-0">让我们继续今天的学习吧！</p>
+            </div>
           </div>
+          <button @click="handleLogout" class="btn btn-outline-danger">
+            退出登录
+          </button>
         </div>
       </div>
 
@@ -117,11 +123,20 @@
 </template>
 
 <script setup lang="ts">
-import { getWechatLoginUrl, handleAuthentication } from '~/utils/auth';
-import { debugMessages, logDebug } from '~/utils/debug';
+import { getWechatLoginUrl, handleAuthentication, logout } from '~/utils/auth';
+const debugMessages = ref<string[]>([]);
+
+function logDebug(message: string) {
+  const timestamp = new Date().toLocaleTimeString();
+  const logMessage = `[${timestamp}] ${message}`;
+  console.log(logMessage);
+  debugMessages.value.push(logMessage);
+}
+
+logDebug(`index init...`);
 
 const isAuthenticated = ref(false);
-const errorMessage = ref('');
+const errorMessage = ref('111');
 const loginWechatUrl = ref(getWechatLoginUrl());
 
 const stats = ref({
@@ -139,7 +154,6 @@ const user = ref(null);
 
 // Fetch initial data
 const fetchData = async () => {
-  logDebug('Fetching data...');
   const { getAuthHeaders } = await import('~/utils/auth');
   const headers = getAuthHeaders();
   
@@ -195,10 +209,18 @@ const unfollowUser = async (userId: string) => {
   await fetchData();
 };
 
+const handleLogout = async () => {
+  logDebug('Logging out...');
+  await logout();
+  isAuthenticated.value = false;
+  user.value = null;
+};
+
 // Authentication logic
 onMounted(async () => {
+  errorMessage.value = '222'
   logDebug(`Mounting component...`);
-  const { isAuthenticated: authStatus, error, userInfo } = await handleAuthentication();
+  const { isAuthenticated: authStatus, error, userInfo } = await handleAuthentication(logDebug);
   logDebug(`Authentication status: ${authStatus}, error: ${error}`);
   
   isAuthenticated.value = authStatus;
