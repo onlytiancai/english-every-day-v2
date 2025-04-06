@@ -114,3 +114,12 @@ pnpm
 gen random jwt token
 
     openssl rand -base64 40
+
+## 部署
+
+    export PATH="/home/ubuntu/download/node-v22.13.1-linux-x64/bin:$PATH"
+    pnpm install
+    pnpm build
+    rsync -avzP --delete .output/ qing2024:/data/www/english-every-day
+
+    PORT=3003 node server/index.mjs
