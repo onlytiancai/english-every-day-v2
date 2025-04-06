@@ -1,4 +1,5 @@
 import { useRuntimeConfig } from '#imports'
+import { logDebug } from './debug'
 
 export interface UserInfo {
   id: string;
@@ -19,26 +20,34 @@ export async function handleAuthentication() {
   const code = route.query.code as string;
   const config = useRuntimeConfig();
 
+  logDebug(`Handling authentication - token exists: ${!!token}, code: ${code}`);
+
   if (token && userInfoStr) {
     const userInfo = JSON.parse(userInfoStr);
+    logDebug(`Using existing token for user: ${userInfo.nickname}`);
     return { isAuthenticated: true, userInfo };
   }
 
   if (code) {
+    logDebug(`Processing WeChat auth code`);
     try {
       const response = await fetch(`${config.public.returnUrl}api/wechat-login?code=${code}`);
       const data = await response.json();
       if (data.success) {
+        logDebug(`WeChat login successful for user: ${data.userInfo.nickname}`);
         localStorage.setItem('token', data.token);
         localStorage.setItem('userInfo', JSON.stringify(data.userInfo));
         return { isAuthenticated: true, userInfo: data.userInfo };
       }
+      logDebug(`WeChat login failed: ${data.error}`);
       return { isAuthenticated: false, error: data.error };
     } catch (error) {
+      logDebug(`WeChat login error: ${error}`);
       return { isAuthenticated: false, error: 'WeChat login error' };
     }
   }
 
+  logDebug('No authentication token or code found');
   return { isAuthenticated: false };
 }
 

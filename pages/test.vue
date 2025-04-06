@@ -1,24 +1,29 @@
 <script setup lang="ts">
-const { data } = await useFetch('/api/learnings')
+definePageMeta({
+  ssr: false,
+})
+const debugMessages = ref<string[]>([]);
 
-async function handleFormSubmit() {
-  const res = await $fetch('/api/submit', {
-    method: 'POST',
-    body: {
-      // My form data
-    }
-  })
+function logDebug(message: string) {
+  const timestamp = new Date().toLocaleTimeString();
+  const logMessage = `[${timestamp}] ${message}`;
+  console.log(logMessage);
+  debugMessages.value.push(logMessage);
 }
+
+logDebug('init ...');
+
+onMounted(async () => {
+  logDebug('onMounted...');
+})
 </script>
 
 <template>
-  Hello {{data}}.
-  <div v-if="data == null">
-    No data
-  </div>
-  <div v-else>
-    <form @submit="handleFormSubmit">
-      <!-- form input tags -->
-    </form>
+  <div>
+    <ul class="list-unstyled mb-0">
+      <li v-for="(message, index) in debugMessages" :key="index" class="mb-1 font-monospace">
+        {{ message }}
+      </li>
+    </ul>
   </div>
 </template>
