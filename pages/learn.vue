@@ -1,12 +1,7 @@
 <template>
   <div v-if="!isAuthenticated">
-    <div v-if="isWeChat">
-      <a :href="loginWechatUrl" class="btn btn-success btn-lg">微信登录</a>
-      <p v-if="errorMessage" class="text-danger">{{ errorMessage }}</p>
-    </div>
-    <div v-else>
-      <p class="text-center">请在微信中打开</p>
-    </div>
+    <a :href="loginWechatUrl" class="btn btn-success btn-lg">微信登录</a>
+    <p v-if="errorMessage" class="text-danger">{{ errorMessage }}</p>
   </div>
   <div v-else class="container mx-auto p-4 space-y-8">
     <!-- Header with progress -->
@@ -74,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { isWeChat, getWechatLoginUrl, handleAuthentication } from '~/utils/auth';
+import { getWechatLoginUrl, handleAuthentication } from '~/utils/auth';
 
 const route = useRoute();
 const router = useRouter();

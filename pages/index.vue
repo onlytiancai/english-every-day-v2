@@ -1,13 +1,8 @@
 <template>
   <div class="container py-4">
     <div v-if="!isAuthenticated">
-      <div v-if="isWeChat">
-        <a :href="loginWechatUrl" class="btn btn-success btn-lg">微信登录</a>
-        <p v-if="errorMessage" class="text-danger">{{ errorMessage }}</p>
-      </div>
-      <div v-else>
-        <p class="text-center">请在微信中打开</p>
-      </div>
+      <a :href="loginWechatUrl" class="btn btn-success btn-lg">微信登录</a>
+      <p v-if="errorMessage" class="text-danger">{{ errorMessage }}</p>
     </div>
     <div v-else>
       <!-- Welcome Section -->
@@ -123,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-import { isWeChat, getWechatLoginUrl, handleAuthentication } from '~/utils/auth';
+import { getWechatLoginUrl, handleAuthentication } from '~/utils/auth';
 
 const isAuthenticated = ref(false);
 const errorMessage = ref('');

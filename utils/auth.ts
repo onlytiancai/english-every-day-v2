@@ -6,8 +6,6 @@ export interface UserInfo {
   headimgurl: string;
 }
 
-export const isWeChat = typeof navigator !== 'undefined' && /MicroMessenger/i.test(navigator.userAgent);
-
 export function getWechatLoginUrl() {
   const config = useRuntimeConfig();
   const redirectUri = encodeURIComponent(config.public.returnUrl);
