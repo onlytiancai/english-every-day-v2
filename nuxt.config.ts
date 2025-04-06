@@ -20,8 +20,8 @@ export default defineNuxtConfig({
     wechatAppSecret: process.env.WECHAT_APP_SECRET,
     jwtSecret: process.env.JWT_SECRET,
     public: {
-      wechatAppId: process.env.WECHAT_APP_ID,
-      returnUrl: process.env.RETURN_URL,
+      wechatAppId: process.env.NUXT_PUBLIC_WECHAT_APP_ID,
+      returnUrl: process.env.NUXT_PUBLIC_RETURN_URL,
     }
   }
 });
