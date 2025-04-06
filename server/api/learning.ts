@@ -1,5 +1,5 @@
 import { defineEventHandler, getQuery } from 'h3'
-import prisma from "~/lib/prisma";
+import prisma from "~/server/lib/prisma";
 import _ from 'lodash'
 import { getCurrentUserId } from '../utils/auth';
 
