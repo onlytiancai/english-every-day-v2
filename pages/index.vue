@@ -1,5 +1,6 @@
 <template>
   <div class="container py-4">
+    {{ errorMessage }}
     <div v-if="!isAuthenticated">
       <a :href="loginWechatUrl" class="btn btn-success btn-lg">微信登录</a>
       <p v-if="errorMessage" class="text-danger">{{ errorMessage }}</p>
@@ -7,29 +8,25 @@
     <div v-else>
       <!-- Welcome Section -->
       <div class="card bg-light mb-4">
-        <div class="card-body d-flex align-items-center p-3">
-          <img 
-            v-if="user?.avatar" 
-            :src="user.avatar" 
-            class="rounded-circle border shadow-sm me-3" 
-            width="64" 
-            height="64" 
-            :alt="user?.name"
-          >
-          <div>
-            <h2 class="h4 mb-1">欢迎回来，{{ user?.name || '同学' }}</h2>
-            <p class="text-muted mb-0">让我们继续今天的学习吧！</p>
+        <div class="card-body d-flex align-items-center justify-content-between p-3">
+          <div class="d-flex align-items-center">
+            <img v-if="user?.avatar" :src="user.avatar" class="rounded-circle border shadow-sm me-3" width="64"
+              height="64" :alt="user?.name">
+            <div>
+              <h2 class="h4 mb-1">欢迎回来，{{ user?.name || '同学' }}</h2>
+              <p class="text-muted mb-0">让我们继续今天的学习吧！</p>
+            </div>
           </div>
+          <button @click="handleLogout" class="btn btn-outline-danger">
+            退出登录
+          </button>
         </div>
       </div>
 
       <!-- Learning Status Button -->
       <div class="text-center mb-4">
-        <button
-          @click="startLearning"
-          class="btn btn-lg px-5 py-3"
-          :class="todayCompleted ? 'btn-success' : 'btn-primary'"
-        >
+        <button @click="startLearning" class="btn btn-lg px-5 py-3"
+          :class="todayCompleted ? 'btn-success' : 'btn-primary'">
           <span class="fs-4">{{ todayCompleted ? '今日学习已完成 🎉' : '开始今日学习' }}</span>
         </button>
       </div>
@@ -90,11 +87,7 @@
               <h5 class="card-title mb-0">今日排行榜</h5>
             </div>
             <div class="card-body">
-              <UserRankList
-                :users="dailyRanking"
-                @like="likeUser"
-                @follow="followUser"
-              />
+              <UserRankList :users="dailyRanking" @like="likeUser" @follow="followUser" />
             </div>
           </div>
         </div>
@@ -104,24 +97,46 @@
               <h5 class="card-title mb-0">本周排行榜</h5>
             </div>
             <div class="card-body">
-              <UserRankList
-                :users="weeklyRanking"
-                @like="likeUser"
-                @follow="followUser"
-              />
+              <UserRankList :users="weeklyRanking" @like="likeUser" @follow="followUser" />
             </div>
           </div>
         </div>
       </div>
+
+
     </div>
+          <!-- Debug Messages Section -->
+
+      <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Debug Information</h5>
+      </div>
+      <div v-if="debugMessages.length" class="card mt-4">
+        <div class="card-body text-start">
+          <ul class="list-unstyled mb-0">
+            <li v-for="(message, index) in debugMessages" :key="index" class="mb-1 font-monospace">
+              {{ message }}
+            </li>
+          </ul>
+        </div>
+      </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { getWechatLoginUrl, handleAuthentication } from '~/utils/auth';
+import { getWechatLoginUrl, handleAuthentication, logout } from '~/utils/auth';
+const debugMessages = ref<string[]>([]);
+
+function logDebug(message: string) {
+  const timestamp = new Date().toLocaleTimeString();
+  const logMessage = `[${timestamp}] ${message}`;
+  console.log(logMessage);
+  debugMessages.value.push(logMessage);
+}
+
+logDebug(`index init...`);
 
 const isAuthenticated = ref(false);
-const errorMessage = ref('');
+const errorMessage = ref('111');
 const loginWechatUrl = ref(getWechatLoginUrl());
 
 const stats = ref({
@@ -142,18 +157,24 @@ const fetchData = async () => {
   const { getAuthHeaders } = await import('~/utils/auth');
   const headers = getAuthHeaders();
   
-  const [statsData, dailyRank, weeklyRank, friendsData] = await Promise.all([
-    $fetch('/api/stats', { headers }),
-    $fetch('/api/ranking/daily', { headers }),
-    $fetch('/api/ranking/weekly', { headers }),
-    $fetch('/api/friends', { headers })
-  ]);
+  try {
+    const [statsData, dailyRank, weeklyRank, friendsData] = await Promise.all([
+      $fetch('/api/stats', { headers }),
+      $fetch('/api/ranking/daily', { headers }),
+      $fetch('/api/ranking/weekly', { headers }),
+      $fetch('/api/friends', { headers })
+    ]);
 
-  stats.value = statsData;
-  dailyRanking.value = dailyRank;
-  weeklyRanking.value = weeklyRank;
-  friends.value = friendsData;
-  todayCompleted.value = statsData.todaySentences > 0;
+    logDebug(`Data fetched successfully - Stats: ${JSON.stringify(statsData)}`);
+    
+    stats.value = statsData;
+    dailyRanking.value = dailyRank;
+    weeklyRanking.value = weeklyRank;
+    friends.value = friendsData;
+    todayCompleted.value = statsData.todaySentences > 0;
+  } catch (error) {
+    logDebug(`Error fetching data: ${error}`);
+  }
 };
 
 // Actions
@@ -188,14 +209,26 @@ const unfollowUser = async (userId: string) => {
   await fetchData();
 };
 
+const handleLogout = async () => {
+  logDebug('Logging out...');
+  await logout();
+  isAuthenticated.value = false;
+  user.value = null;
+};
+
 // Authentication logic
 onMounted(async () => {
-  const { isAuthenticated: authStatus, error, userInfo } = await handleAuthentication();
+  errorMessage.value = '222'
+  logDebug(`Mounting component...`);
+  const { isAuthenticated: authStatus, error, userInfo } = await handleAuthentication(logDebug);
+  logDebug(`Authentication status: ${authStatus}, error: ${error}`);
+  
   isAuthenticated.value = authStatus;
   if (error) {
     errorMessage.value = error;
   }
   if (authStatus) {
+    logDebug(`User authenticated: ${userInfo.nickname}`);
     user.value = {
       name: userInfo.nickname,
       avatar: userInfo.headimgurl

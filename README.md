@@ -115,6 +115,13 @@ gen random jwt token
 
     openssl rand -base64 40
 
+prisma client  issue
+
+    rm -rf node_modules
+    npm install
+    npm run build
+    node .output/server/index.mjs
+
 ## 部署
 
     export PATH="/home/ubuntu/download/node-v22.13.1-linux-x64/bin:$PATH"
@@ -123,3 +130,4 @@ gen random jwt token
     rsync -avzP --delete .output/ qing2024:/data/www/english-every-day
 
     PORT=3003 node server/index.mjs
+

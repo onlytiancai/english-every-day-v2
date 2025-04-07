@@ -1,24 +1,7 @@
 <script setup lang="ts">
-const { data } = await useFetch('/api/learnings')
-
-async function handleFormSubmit() {
-  const res = await $fetch('/api/submit', {
-    method: 'POST',
-    body: {
-      // My form data
-    }
-  })
-}
+const errorMessage = ref('111');
+onMounted(async () => {  errorMessage.value = '222'})
 </script>
-
 <template>
-  Hello {{data}}.
-  <div v-if="data == null">
-    No data
-  </div>
-  <div v-else>
-    <form @submit="handleFormSubmit">
-      <!-- form input tags -->
-    </form>
-  </div>
+<div> {{ errorMessage }} </div>
 </template>
