@@ -178,3 +178,7 @@ nginx
     $ cd /data/www/english-every-day
     $ source env-english-every-day.sh
     $ node app/server/index.mjs
+
+fetch(’/api/wechat-login/') 和 $fetch(’/api/wechat-login/') 的区别
+
+- 后者会自动加 NUXT_APP_BASE_URL/baseURL 前缀，前者会访问域名根目录

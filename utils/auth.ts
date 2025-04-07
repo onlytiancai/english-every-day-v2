@@ -1,11 +1,5 @@
 import { useRuntimeConfig } from '#imports'
 
-function logDebug(message: string) {
-  const timestamp = new Date().toLocaleTimeString();
-  const logMessage = `[${timestamp}] ${message}`;
-  console.log(logMessage);
-}
-
 export interface UserInfo {
   id: string;
   nickname: string;
@@ -19,6 +13,7 @@ export function getWechatLoginUrl() {
 }
 
 export async function handleAuthentication(log) {
+  if (!log) log = console.log
   const token = localStorage.getItem('token');
   const userInfoStr = localStorage.getItem('userInfo');
   const route = useRoute();
@@ -36,8 +31,7 @@ export async function handleAuthentication(log) {
   if (code) {
     log(`Processing WeChat auth code`);
     try {
-      const response = await fetch(`${config.public.returnUrl}api/wechat-login?code=${code}`);
-      const data = await response.json();
+      const data = await $fetch(`/api/wechat-login?code=${code}`);
       if (data.success) {
         log(`WeChat login successful for user: ${data.userInfo.nickname}`);
         localStorage.setItem('token', data.token);
@@ -48,7 +42,7 @@ export async function handleAuthentication(log) {
       return { isAuthenticated: false, error: data.error };
     } catch (error) {
       log(`WeChat login error: ${error}`);
-      return { isAuthenticated: false, error: 'WeChat login error' };
+      return { isAuthenticated: false, error: `WeChat login error: ${error}` };
     }
   }
 

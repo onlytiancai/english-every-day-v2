@@ -1,9 +1,5 @@
 <template>
-  <div v-if="!isAuthenticated">
-    <a :href="loginWechatUrl" class="btn btn-success btn-lg">微信登录</a>
-    <p v-if="errorMessage" class="text-danger">{{ errorMessage }}</p>
-  </div>
-  <div v-else class="container mx-auto p-4 space-y-8">
+  <div class="container mx-auto p-4 space-y-8">
     <!-- Header with progress -->
     <div class="flex justify-between items-center">
       <div class="text-lg">
@@ -69,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { getWechatLoginUrl, handleAuthentication } from '~/utils/auth';
+import { handleAuthentication } from '~/utils/auth';
 
 const route = useRoute();
 const router = useRouter();
@@ -81,10 +77,6 @@ const showExplanation = ref(false);
 const autoPlayMode = ref(false);
 const repetitionCount = ref(0);
 const sentenceCount = ref(0);
-const isAuthenticated = ref(false);
-const errorMessage = ref('');
-const loginWechatUrl = ref(getWechatLoginUrl());
-
 const currentSentence = ref({
   id: '',
   english: '',
@@ -95,18 +87,17 @@ const currentSentence = ref({
 
 // Authentication check
 onMounted(async () => {
-  const { isAuthenticated: authStatus, error } = await handleAuthentication();
-  isAuthenticated.value = authStatus;
-  if (error) {
-    errorMessage.value = error;
+  const { isAuthenticated: authStatus, error } = await handleAuthentication(null);
+  if (!authStatus) {
+    await navigateTo('/login');
+    return;
   }
-  if (authStatus) {
-    await fetchNewSentence();
-    await fetchTodayProgress();
-    setTimeout(() => {
-      audioPlayer.value?.play();
-    }, 500);
-  }
+  
+  await fetchNewSentence();
+  await fetchTodayProgress();
+  setTimeout(() => {
+    audioPlayer.value?.play();
+  }, 500);
 });
 
 // Fetch a new random sentence

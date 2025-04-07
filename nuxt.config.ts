@@ -25,6 +25,7 @@ export default defineNuxtConfig({
     public: {
       wechatAppId: process.env.NUXT_PUBLIC_WECHAT_APP_ID,
       returnUrl: process.env.NUXT_PUBLIC_RETURN_URL,
+      baseUrl: process.env.NUXT_PUBLIC_BASE_URL,
     }
   },
   vite: {
