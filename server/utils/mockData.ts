@@ -1,14 +1,14 @@
 const avatars = [
-  '/avatars/avatar1.jpeg',
-  '/avatars/avatar2.jpeg',
-  '/avatars/avatar3.jpeg',
-  '/avatars/avatar4.jpeg',
-  '/avatars/avatar5.jpeg',
-  '/avatars/avatar6.jpeg',
-  '/avatars/avatar7.jpeg',
-  '/avatars/avatar8.jpeg',
-  '/avatars/avatar9.jpeg',
-  '/avatars/avatar10.jpeg',
+  'avatars/avatar1.jpeg',
+  'avatars/avatar2.jpeg',
+  'avatars/avatar3.jpeg',
+  'avatars/avatar4.jpeg',
+  'avatars/avatar5.jpeg',
+  'avatars/avatar6.jpeg',
+  'avatars/avatar7.jpeg',
+  'avatars/avatar8.jpeg',
+  'avatars/avatar9.jpeg',
+  'avatars/avatar10.jpeg',
 ];
 
 const mockUsers = [
@@ -30,20 +30,27 @@ export const getMockStats = () => ({
 });
 
 export const getMockRankingUsers = (count: number) => {
+  const runtimeConfig = useRuntimeConfig()
+  const baseURL = runtimeConfig.app.baseURL
+  
   return mockUsers
     .slice(0, count)
     .map(user => ({
       ...user,
       sentenceCount: Math.floor(Math.random() * 20),
       isFollowing: Math.random() > 0.5,
+      avatar: baseURL + user.avatar
     }));
 };
 
 export const getMockFriends = () => {
+  const runtimeConfig = useRuntimeConfig()
+  const baseURL = runtimeConfig.app.baseURL
   return mockUsers.map(user => ({
     ...user,
     todayCount: Math.floor(Math.random() * 10),
     weekCount: Math.floor(Math.random() * 50),
     isFollowing: true,
+    avatar: baseURL + user.avatar
   }));
 };
