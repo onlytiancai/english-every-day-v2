@@ -23,5 +23,12 @@ export default defineNuxtConfig({
       wechatAppId: process.env.NUXT_PUBLIC_WECHAT_APP_ID,
       returnUrl: process.env.NUXT_PUBLIC_RETURN_URL,
     }
-  }
+  },
+  vite: {
+    resolve: {
+      alias: {
+        '.prisma/client/index-browser': './node_modules/.prisma/client/index-browser.js',
+      },
+    },
+  },
 });
