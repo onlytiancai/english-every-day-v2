@@ -1,5 +1,5 @@
 import { mean } from "lodash";
-import prisma from "~/server/lib/prisma";
+import prisma from "~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
     const sentences = Array.from({ length: 2000 }, (_, i) => ({

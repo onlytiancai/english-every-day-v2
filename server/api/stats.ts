@@ -1,4 +1,4 @@
-import prisma from "~/server/lib/prisma";
+import prisma from "~/lib/prisma";
 import { getCurrentUserId } from '../utils/auth';
 
 export default defineEventHandler(async (event) => {
