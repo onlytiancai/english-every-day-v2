@@ -127,7 +127,54 @@ prisma client  issue
     export PATH="/home/ubuntu/download/node-v22.13.1-linux-x64/bin:$PATH"
     pnpm install
     pnpm build
-    rsync -avzP --delete .output/ qing2024:/data/www/english-every-day
 
-    PORT=3003 node server/index.mjs
 
+    source ../env-english-every-day.sh
+    node server/index.mjs
+
+nginx
+
+    location /en {
+        # 代理到本地 3003 端口
+        proxy_pass http://127.0.0.1:3003;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_http_version 1.1;
+
+    }
+
+    # prod
+    mkdir -p /data/www/english-every-day/app
+    mkdir -p /data/www/english-every-day/db
+
+    # local
+    npm run build
+    rsync -avzP --delete .output/ qing2024:/data/www/english-every-day/app
+    rsync -avzP ./prisma qing2024:/data/www/english-every-day/db/
+
+    # prod
+    $ cd /data/www/english-every-day
+    $ cat env-myqpp.sh
+    export WECHAT_APP_ID=
+    export WECHAT_APP_SECRET=
+    export JWT_SECRET=
+    export DATABASE_URL="file:/data/www/english-every-day/db.db"
+    export RETURN_URL="https://english-every-day.com/en/"
+    export PORT=3003
+    export NUXT_PUBLIC_RETURN_URL="https://myqpp.com/en/"
+    export NUXT_PUBLIC_WECHAT_APP_ID=
+    export NUXT_APP_BASE_URL="/en/"
+
+    $ cd /data/www/english-every-day/db
+    $ cat .env
+    DATABASE_URL=file:/data/www/english-every-day/db.db
+    $ npx prisma migrate deploy
+
+    $ cd /data/www/english-every-day
+    $ source env-english-every-day.sh
+    $ node app/server/index.mjs

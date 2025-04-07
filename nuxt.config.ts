@@ -2,6 +2,9 @@ import { defineNuxtConfig } from 'nuxt/config';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  app: {
+    baseURL: process.env.NUXT_APP_BASE_URL || '/'
+  },
   modules: [
     '@ant-design-vue/nuxt',
     "@prisma/nuxt"
