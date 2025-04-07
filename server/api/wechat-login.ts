@@ -1,6 +1,7 @@
 import { defineEventHandler, getQuery } from 'h3';
 import axios from 'axios';
 import { generateToken } from '../utils/auth';
+import prisma from "~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
   console.log('wechat-login API triggered');
@@ -33,10 +34,29 @@ export default defineEventHandler(async (event) => {
 
     const userInfo = userInfoResponse.data;
 
-    // 使用统一的 token 生成函数
+    // Find or create user
+    let user = await prisma.user.findFirst({
+      where: {
+        unionid: userInfo.unionid
+      }
+    });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          name: userInfo.nickname,
+          openid: openid,
+          unionid: userInfo.unionid,
+          userinfo: JSON.stringify(userInfo)
+        }
+      });
+    }
+
+    // Generate token with user ID
     const token = await generateToken({ 
-      openid: openid,
-      unionid: userInfo.unionid
+      openid,
+      unionid: userInfo.unionid,
+      userId: user.id
     });
 
     return { success: true, userInfo, token };

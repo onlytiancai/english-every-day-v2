@@ -1,9 +1,11 @@
 import jwt from 'jsonwebtoken'
 import { useRuntimeConfig } from '#imports'
+import { getRequestHeaders, createError } from 'h3'
 
 export interface JWTPayload {
   openid: string
   unionid?: string
+  userId: number
   iat?: number
   exp?: number
 }
@@ -36,17 +38,28 @@ export async function generateToken(payload: JWTPayload): Promise<string> {
   })
 }
 
-// Define the getCurrentUserId function
-export function getCurrentUserId(): number | undefined {
-  return 1
-  // Example implementation: retrieve user ID from a decoded token
-  const token = ''; // Replace with logic to get the token (e.g., from headers or cookies)
+export async function getCurrentUserId(event: any): Promise<number> {
+  const headers = getRequestHeaders(event);
+  const token = headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    throw createError({
+      statusCode: 401,
+      message: '未授权访问'
+    });
+  }
+
   const config = useRuntimeConfig();
   try {
     const decoded = jwt.verify(token, config.jwtSecret) as JWTPayload;
-    return decoded.openid || null;
+    if (!decoded.userId) {
+      throw new Error('Invalid token: no userId');
+    }
+    return decoded.userId;
   } catch (error) {
-    console.error('Failed to get current user ID:', error);
-    return null;
+    throw createError({
+      statusCode: 401,
+      message: 'Token 无效'
+    });
   }
 }

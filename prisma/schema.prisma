@@ -14,8 +14,11 @@ generator client {
 
 model User {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
+  email     String?  @unique
   name      String
+  openid    String?  @unique
+  unionid   String?  @unique
+  userinfo  String?  // JSON string for WeChat user info
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

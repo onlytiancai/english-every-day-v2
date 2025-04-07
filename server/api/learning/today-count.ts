@@ -4,7 +4,7 @@ import { getCurrentUserId } from '~/server/utils/auth'
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
-  const userId = getCurrentUserId()
+  const userId = getCurrentUserId(event)
   if (!userId) {
     throw createError({
       statusCode: 401,

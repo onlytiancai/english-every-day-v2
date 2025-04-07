@@ -1,9 +1,27 @@
-import { defineEventHandler, getQuery } from 'h3'
+import { defineEventHandler, getQuery, getRequestHeaders } from 'h3'
 import prisma from "~/lib/prisma";
 import _ from 'lodash'
-import { getCurrentUserId } from '../utils/auth';
+import { getCurrentUserId, verifyToken } from '../utils/auth';
 
 export default defineEventHandler(async (event) => {
+  // Add token verification
+  const headers = getRequestHeaders(event);
+  const token = headers.authorization?.split(' ')[1];
+  if (!token) {
+    throw createError({
+      statusCode: 401,
+      message: '未授权访问'
+    });
+  }
+
+  const isValid = await verifyToken(token);
+  if (!isValid) {
+    throw createError({
+      statusCode: 401,
+      message: 'Token 无效'
+    });
+  }
+
   const method = event.method
   const query = getQuery(event)
 
