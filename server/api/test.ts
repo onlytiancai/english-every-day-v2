@@ -1,15 +1,40 @@
-import { mean } from "lodash";
+import { parse } from 'csv-parse/sync';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import prisma from "~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
-    const sentences = Array.from({ length: 2000 }, (_, i) => ({
-        content: `Sample sentence ${i + 1}`,
-        meaning: `Sample meaning ${i + 1}`,
+    // Read CSV file
+    const csvFilePath = resolve(process.cwd(), 'scripts/output.csv');
+    const fileContent = readFileSync(csvFilePath, 'utf-8');
+    
+    // Parse CSV content
+    const records = parse(fileContent, {
+        columns: true,
+        skip_empty_lines: true
+    });
+
+    // Transform records to sentence format
+    const sentences = records.map((record: any, index: number) => ({
+        id: index + 1, // Start from 1, excluding header
+        content: record.Sentence,
+        meaning: '', // Empty meaning as it's not in CSV
     }));
 
+    // Clear existing data
+    await prisma.sentence.deleteMany();
+
+    // Reset auto-increment
+    await prisma.$executeRaw`DELETE FROM sqlite_sequence WHERE name = 'Sentence'`;
+
+    // Insert new sentences
     await prisma.sentence.createMany({
         data: sentences,
     });
 
-    return { message: "2000 sentences inserted successfully" };
+    return { 
+        message: `${sentences.length} sentences imported successfully`,
+        firstSentence: sentences[0],
+        lastSentence: sentences[sentences.length - 1]
+    };
 });
