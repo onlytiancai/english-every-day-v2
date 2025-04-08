@@ -4,6 +4,15 @@ import { resolve } from 'path';
 import prisma from "~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
+    // Get client IP and validate
+    const clientIp = getRequestIP(event);
+    if (clientIp !== '127.0.0.1') {
+        throw createError({
+            statusCode: 403,
+            message: 'Access denied. This endpoint is only accessible from 127.0.0.1'
+        });
+    }
+
     // Read CSV file
     const csvFilePath = resolve(process.cwd(), 'scripts/output.csv');
     const fileContent = readFileSync(csvFilePath, 'utf-8');
@@ -22,6 +31,7 @@ export default defineEventHandler(async (event) => {
     }));
 
     // Clear existing data
+    await prisma.userLearningRecord.deleteMany();
     await prisma.sentence.deleteMany();
 
     // Reset auto-increment
