@@ -85,6 +85,13 @@ const currentSentence = ref({
   mp3: ''
 });
 
+// Add watcher for autoPlayMode
+watch(autoPlayMode, (newValue) => {
+  if (newValue && audioPlayer.value) {
+    audioPlayer.value.play();
+  }
+});
+
 // Authentication check
 onMounted(async () => {
   const { isAuthenticated: authStatus, error } = await handleAuthentication(null);
