@@ -223,11 +223,13 @@ const handleShare = async () => {
     }
 
     logDebug('配置分享数据...');
+    const config = useRuntimeConfig();
+
     const shareData = {
       title: '每日英语学习',
       desc: `${user.value?.name}已经学习了${stats.value.weekSentences}句，快来一起打卡吧！`,
       link: window.location.href.split('#')[0],
-      imgUrl: `${window.location.origin}/share-logo.png`,
+      imgUrl: `${config.public.baseUrl}share-logo.png`,
       type: 'link',
       dataUrl: '',
       success: function () {
