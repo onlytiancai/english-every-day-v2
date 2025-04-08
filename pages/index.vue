@@ -209,39 +209,72 @@ const handleLogout = async () => {
   await navigateTo('/login');
 };
 
-// 微信分享配置
 const handleShare = async () => {
   try {
-    const { getAuthHeaders } = await import('~/utils/auth');
-    // 获取微信分享配置
-    const wxConfig = await $fetch('/api/wechat/share', {
-      headers: getAuthHeaders(),
-      params: {
-        url: window.location.href
+    logDebug('开始处理分享...');
+    
+    // 检查是否在微信环境
+    const isWechat = /MicroMessenger/i.test(navigator.userAgent);
+    logDebug(`当前环境: ${isWechat ? '微信' : '非微信'}`);
+    
+    if (!isWechat) {
+      alert('请在微信中打开进行分享');
+      return;
+    }
+
+    logDebug('配置分享数据...');
+    const shareData = {
+      title: '每日英语学习',
+      desc: `${user.value?.name}已经学习了${stats.value.weekSentences}句，快来一起打卡吧！`,
+      link: window.location.href.split('#')[0],
+      imgUrl: `${window.location.origin}/share-logo.png`,
+      type: 'link',
+      dataUrl: '',
+      success: function () {
+        logDebug('分享设置成功');
+      },
+      cancel: function () {
+        logDebug('用户取消分享');
+      },
+      fail: function (res: any) {
+        logDebug('分享失败: ' + JSON.stringify(res));
       }
-    });
+    };
+    logDebug('shareData: ' + JSON.stringify(shareData, null, 2));
 
-    // @ts-ignore
-    wx.config({
-      debug: false,
-      ...wxConfig
-    });
-
-    // @ts-ignore
-    wx.ready(() => {
+    try {
       // @ts-ignore
       wx.updateAppMessageShareData({
-        title: '每日英语学习',
-        desc: `${user.value?.name}已经学习了${stats.value.weekSentences}句，快来一起打卡吧！`,
-        link: window.location.href,
-        imgUrl: `${window.location.origin}/share-logo.png`,
-        success: function () {
-          logDebug('分享设置成功');
+        ...shareData,
+        success: () => {
+          logDebug('分享到好友配置成功');
+        },
+        fail: (res: any) => {
+          logDebug('分享到好友配置失败: ' + JSON.stringify(res));
         }
       });
-    });
+
+      // @ts-ignore
+      wx.updateTimelineShareData({
+        ...shareData,
+        success: () => {
+          logDebug('分享到朋友圈配置成功');
+        },
+        fail: (res: any) => {
+          logDebug('分享到朋友圈配置失败: ' + JSON.stringify(res));
+        }
+      });
+      
+      logDebug('分享接口设置完成');
+    } catch (e) {
+      const errorMsg = '注册分享接口失败: ' + e;
+      logDebug(errorMsg);
+      alert(errorMsg);
+    }
   } catch (error) {
-    logDebug(`配置分享失败: ${error}`);
+    const errorMsg = `分享处理失败: ${error.message || error}`;
+    logDebug(errorMsg);
+    alert(errorMsg);
   }
 };
 
@@ -262,5 +295,50 @@ onMounted(async () => {
     avatar: userInfo.headimgurl
   };
   await fetchData();
+
+  // 初始化微信配置
+  try {
+    const { getAuthHeaders } = await import('~/utils/auth');
+    const currentUrl = window.location.href.split('#')[0];
+    logDebug(`初始化微信配置，当前URL: ${currentUrl}`);
+    
+    const { data: response } = await useFetch('/api/wechat/share', {
+      headers: getAuthHeaders(),
+      params: { url: encodeURIComponent(currentUrl) }
+    });
+
+    if (!response.value || !response.value.success) {
+      throw new Error('Failed to get WeChat config');
+    }
+
+    const wxConfig = response.value.data;
+    logDebug('微信配置参数: ' + JSON.stringify(wxConfig, null, 2));
+
+    // @ts-ignore
+    wx.config({
+      debug: false,
+      appId: wxConfig.appId,
+      timestamp: wxConfig.timestamp,
+      nonceStr: wxConfig.nonceStr,
+      signature: wxConfig.signature,
+      jsApiList: wxConfig.jsApiList,
+      openTagList: ['wx-open-launch-weapp']
+    });
+
+    // @ts-ignore
+    wx.ready(() => {
+      logDebug('微信配置就绪');
+    });
+
+    // @ts-ignore
+    wx.error((res: any) => {
+      const errorMsg = '微信配置失败: ' + JSON.stringify(res);
+      logDebug(errorMsg);
+    });
+
+  } catch (error) {
+    const errorMsg = `微信配置初始化失败: ${error.message || error}`;
+    logDebug(errorMsg);
+  }
 });
 </script>
