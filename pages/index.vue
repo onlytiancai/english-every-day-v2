@@ -11,9 +11,14 @@
             <p class="text-muted mb-0">让我们继续今天的学习吧！</p>
           </div>
         </div>
-        <button @click="handleLogout" class="btn btn-outline-danger">
-          退出登录
-        </button>
+        <div class="d-flex gap-2">
+          <button @click="handleShare" class="btn btn-outline-primary">
+            <ShareAltOutlined /> 分享
+          </button>
+          <button @click="handleLogout" class="btn btn-outline-danger">
+            退出登录
+          </button>
+        </div>
       </div>
     </div>
 
@@ -202,6 +207,42 @@ const handleLogout = async () => {
   isAuthenticated.value = false;
   user.value = null;
   await navigateTo('/login');
+};
+
+// 微信分享配置
+const handleShare = async () => {
+  try {
+    const { getAuthHeaders } = await import('~/utils/auth');
+    // 获取微信分享配置
+    const wxConfig = await $fetch('/api/wechat/share', {
+      headers: getAuthHeaders(),
+      params: {
+        url: window.location.href
+      }
+    });
+
+    // @ts-ignore
+    wx.config({
+      debug: false,
+      ...wxConfig
+    });
+
+    // @ts-ignore
+    wx.ready(() => {
+      // @ts-ignore
+      wx.updateAppMessageShareData({
+        title: '每日英语学习',
+        desc: `${user.value?.name}已经学习了${stats.value.weekSentences}句，快来一起打卡吧！`,
+        link: window.location.href,
+        imgUrl: `${window.location.origin}/share-logo.png`,
+        success: function () {
+          logDebug('分享设置成功');
+        }
+      });
+    });
+  } catch (error) {
+    logDebug(`配置分享失败: ${error}`);
+  }
 };
 
 // Authentication logic

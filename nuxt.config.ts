@@ -3,7 +3,12 @@ import { defineNuxtConfig } from 'nuxt/config';
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   app: {
-    baseURL: process.env.NUXT_APP_BASE_URL || '/'
+    baseURL: process.env.NUXT_APP_BASE_URL || '/',
+    head: {
+      script: [
+        { src: 'https://res.wx.qq.com/open/js/jweixin-1.6.0.js' }
+      ]
+    }
   },
   modules: [
     '@ant-design-vue/nuxt',

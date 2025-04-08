@@ -6,10 +6,10 @@ import prisma from "~/lib/prisma";
 export default defineEventHandler(async (event) => {
     // Get client IP and validate
     const clientIp = getRequestIP(event);
-    if (clientIp !== '127.0.0.1') {
+    if (clientIp !== '127.0.0.1' && clientIp !== '::ffff:127.0.0.1') {
         throw createError({
             statusCode: 403,
-            message: 'Access denied. This endpoint is only accessible from 127.0.0.1'
+            message: `${clientIp} - Access denied. This endpoint is only accessible from localhost`
         });
     }
 
