@@ -1,5 +1,16 @@
 <template>
   <div class="container py-4">
+    <!-- Toast Notification -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+      <div id="shareToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header" :class="toastType === 'success' ? 'bg-success text-white' : 'bg-danger text-white'">
+          <strong class="me-auto">提示</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">{{ toastMessage }}</div>
+      </div>
+    </div>
+
     <!-- Welcome Section -->
     <div class="card bg-light mb-4">
       <div class="card-body d-flex align-items-center justify-content-between p-3">
@@ -7,16 +18,16 @@
           <img v-if="user?.avatar" :src="user.avatar" class="rounded-circle border shadow-sm me-3" width="64"
             height="64" :alt="user?.name">
           <div>
-            <h2 class="h4 mb-1">欢迎回来，{{ user?.name || '同学' }}</h2>
+            <h2 class="h6 mb-1">欢迎回来，{{ user?.name || '同学' }}</h2>
             <p class="text-muted mb-0">让我们继续今天的学习吧！</p>
           </div>
         </div>
-        <div class="d-flex gap-2">
-          <button @click="handleShare" class="btn btn-outline-primary">
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <button @click="handleShare" class="btn btn-outline-primary btn-sm">
             <ShareAltOutlined /> 分享
           </button>
-          <button @click="handleLogout" class="btn btn-outline-danger">
-            退出登录
+          <button @click="handleLogout" class="btn btn-outline-danger btn-sm">
+            <LogoutOutlined /> 退出
           </button>
         </div>
       </div>
@@ -31,18 +42,18 @@
     </div>
 
     <!-- Dashboard Stats -->
-    <div class="row g-3 mb-4">
-      <div class="col-md-3">
-        <DashboardCard title="今日学习句子" :value="stats.todaySentences" icon="BookOutlined" />
+    <div class="row g-2 mb-4">
+      <div class="col-3 col-lg-3">
+        <DashboardCard title="今日" subtitle="句子" :value="stats.todaySentences" icon="FileTextOutlined" />
       </div>
-      <div class="col-md-3">
-        <DashboardCard title="本周学习句子" :value="stats.weekSentences" icon="CalendarOutlined" />
+      <div class="col-3 col-lg-3">
+        <DashboardCard title="本周" subtitle="句子" :value="stats.weekSentences" icon="FileTextOutlined" />
       </div>
-      <div class="col-md-3">
-        <DashboardCard title="今日获赞" :value="stats.todayLikes" icon="HeartOutlined" />
+      <div class="col-3 col-lg-3">
+        <DashboardCard title="今日" subtitle="获赞" :value="stats.todayLikes" icon="HeartOutlined" />
       </div>
-      <div class="col-md-3">
-        <DashboardCard title="本周获赞" :value="stats.weekLikes" icon="LikeOutlined" />
+      <div class="col-3 col-lg-3">
+        <DashboardCard title="本周" subtitle="获赞" :value="stats.weekLikes" icon="HeartOutlined" />
       </div>
     </div>
 
@@ -111,6 +122,7 @@
 </template>
 
 <script setup lang="ts">
+import { LogoutOutlined } from '@ant-design/icons-vue';
 import { checkAuth, logout } from '~/utils/auth';
 const { debugMessages, logDebug, clearDebugMessages } = useDebugLog();
 
@@ -134,6 +146,10 @@ const friends = ref<Array<{
 }>>([]);
 const todayCompleted = ref(false);
 const user = ref(null);
+
+const toastMessage = ref('');
+const toastType = ref('success');
+let toast: any = null;
 
 // Add helper function for API error handling
 const handleApiError = async (error: any) => {
@@ -221,16 +237,21 @@ const handleLogout = async () => {
   await navigateTo('/login');
 };
 
+const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+  toastMessage.value = message;
+  toastType.value = type;
+  toast?.show();
+};
+
 const handleShare = async () => {
   try {
     logDebug('开始处理分享...');
     
-    // 检查是否在微信环境
     const isWechat = /MicroMessenger/i.test(navigator.userAgent);
     logDebug(`当前环境: ${isWechat ? '微信' : '非微信'}`);
     
     if (!isWechat) {
-      alert('请在微信中打开进行分享');
+      showToast('请在微信中打开进行分享', 'error');
       return;
     }
 
@@ -262,9 +283,11 @@ const handleShare = async () => {
         ...shareData,
         success: () => {
           logDebug('分享到好友配置成功');
+          showToast('分享设置成功，请点击右上角进行分享');
         },
         fail: (res: any) => {
           logDebug('分享到好友配置失败: ' + JSON.stringify(res));
+          showToast('分享设置失败，请稍后重试', 'error');
         }
       });
 
@@ -283,12 +306,12 @@ const handleShare = async () => {
     } catch (e) {
       const errorMsg = '注册分享接口失败: ' + e;
       logDebug(errorMsg);
-      alert(errorMsg);
+      showToast(errorMsg, 'error');
     }
   } catch (error) {
     const errorMsg = `分享处理失败: ${error.message || error}`;
     logDebug(errorMsg);
-    alert(errorMsg);
+    showToast(errorMsg, 'error');
   }
 };
 
@@ -355,5 +378,13 @@ onMounted(async () => {
     const errorMsg = `微信配置初始化失败: ${error.message || error}`;
     logDebug(errorMsg);
   }
+
+  toast = new bootstrap.Toast(document.getElementById('shareToast'));
 });
 </script>
+
+<style scoped>
+.toast-container {
+  z-index: 1056;
+}
+</style>
