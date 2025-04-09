@@ -61,11 +61,15 @@
         Back to Home
       </button>
     </div>
+    <!-- Debug Messages Section -->
+    <DebugMessages :messages="debugMessages" @clear="clearDebugMessages" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { checkAuth } from '~/utils/auth';
+const { debugMessages, logDebug, clearDebugMessages } = useDebugLog();
+
 
 const route = useRoute();
 const router = useRouter();

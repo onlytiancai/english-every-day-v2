@@ -103,31 +103,16 @@
     </div>
 
     <!-- Debug Messages Section -->
-    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-      <h5 class="card-title mb-0">Debug Information</h5>
-    </div>
-    <div v-if="debugMessages.length" class="card mt-4">
-      <div class="card-body text-start">
-        <ul class="list-unstyled mb-0">
-          <li v-for="(message, index) in debugMessages" :key="index" class="mb-1 font-monospace">
-            {{ message }}
-          </li>
-        </ul>
-      </div>
-    </div>
+    <DebugMessages 
+      :messages="debugMessages" 
+      @clear="clearDebugMessages"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { checkAuth, logout } from '~/utils/auth';
-const debugMessages = ref<string[]>([]);
-
-function logDebug(message: string) {
-  const timestamp = new Date().toLocaleTimeString();
-  const logMessage = `[${timestamp}] ${message}`;
-  console.log(logMessage);
-  debugMessages.value.push(logMessage);
-}
+const { debugMessages, logDebug, clearDebugMessages } = useDebugLog();
 
 const isAuthenticated = ref(false);
 const errorMessage = ref('');

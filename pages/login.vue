@@ -4,11 +4,15 @@
       <a :href="loginWechatUrl" class="btn btn-success btn-lg">微信登录</a>
       <p v-if="errorMessage" class="text-danger mt-3">{{ errorMessage }}</p>
     </div>
+    <!-- Debug Messages Section -->
+    <DebugMessages :messages="debugMessages" @clear="clearDebugMessages" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { getWechatLoginUrl, loginWithWechat } from '~/utils/auth';
+const { debugMessages, logDebug, clearDebugMessages } = useDebugLog();
+
 
 const router = useRouter();
 const route = useRoute();
