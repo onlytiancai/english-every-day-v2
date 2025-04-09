@@ -1,15 +1,17 @@
 <template>
   <div class="container py-4">
     <!-- Toast Notification -->
-    <div class="toast-container position-fixed top-0 end-0 p-3">
-      <div id="shareToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header" :class="toastType === 'success' ? 'bg-success text-white' : 'bg-danger text-white'">
-          <strong class="me-auto">提示</strong>
-          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    <Transition name="toast">
+      <div v-if="isToastVisible" class="toast-container position-fixed top-0 end-0 p-3">
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header" :class="toastType === 'success' ? 'bg-success text-white' : 'bg-danger text-white'">
+            <strong class="me-auto">提示</strong>
+            <button @click="hideToast" type="button" class="btn-close" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">{{ toastMessage }}</div>
         </div>
-        <div class="toast-body">{{ toastMessage }}</div>
       </div>
-    </div>
+    </Transition>
 
     <!-- Welcome Section -->
     <div class="card bg-light mb-4">
@@ -129,6 +131,8 @@ import confetti from 'canvas-confetti';
 import { checkAuth, logout } from '~/utils/auth';
 const { debugMessages, logDebug, clearDebugMessages } = useDebugLog();
 
+const { $bootstrap } = useNuxtApp();
+
 const isAuthenticated = ref(false);
 const errorMessage = ref('');
 const stats = ref({
@@ -153,7 +157,30 @@ const user = ref(null);
 
 const toastMessage = ref('');
 const toastType = ref('success');
-let toast: any = null;
+const isToastVisible = ref(false);
+let toastTimeout: NodeJS.Timeout | null = null;
+
+const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+  if (toastTimeout) {
+    clearTimeout(toastTimeout);
+  }
+  
+  toastMessage.value = message;
+  toastType.value = type;
+  isToastVisible.value = true;
+  
+  toastTimeout = setTimeout(() => {
+    hideToast();
+  }, 3000);
+};
+
+const hideToast = () => {
+  isToastVisible.value = false;
+  if (toastTimeout) {
+    clearTimeout(toastTimeout);
+    toastTimeout = null;
+  }
+};
 
 // Add helper function for API error handling
 const handleApiError = async (error: any) => {
@@ -162,28 +189,6 @@ const handleApiError = async (error: any) => {
     logDebug('Unauthorized, redirecting to login...');
     await navigateTo('/login');
   }
-};
-
-// Toast initialization
-const initToast = () => {
-  if (process.client) {
-    const Toast = (window as any).bootstrap?.Toast;
-    const toastEl = document.getElementById('shareToast');
-    if (Toast && toastEl) {
-      toast = new Toast(toastEl, {
-        delay: 3000
-      });
-    }
-  }
-};
-
-const showToast = (message: string, type: 'success' | 'error' = 'success') => {
-  toastMessage.value = message;
-  toastType.value = type;
-  initToast(); // 每次显示时都重新初始化
-  nextTick(() => {
-    toast?.show();
-  });
 };
 
 // Fetch initial data
@@ -413,15 +418,22 @@ onMounted(async () => {
     const errorMsg = `微信配置初始化失败: ${error.message || error}`;
     logDebug(errorMsg);
   }
-
-  nextTick(() => {
-    initToast();
-  });
 });
 </script>
 
 <style scoped>
 .toast-container {
   z-index: 1056;
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s ease;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
 }
 </style>
