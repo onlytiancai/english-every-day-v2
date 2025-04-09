@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 interface User {
-  id: string;
+  id: number;  // Change type from string to number
   name: string;
   avatar: string;
   sentenceCount: number;
@@ -38,7 +38,7 @@ defineProps<{
 }>();
 
 defineEmits<{
-  (e: 'like', userId: string): void;
-  (e: 'follow', userId: string): void;
+  (e: 'like', userId: number): void;  // Change type from string to number
+  (e: 'follow', userId: number): void;  // Change type from string to number
 }>();
 </script>

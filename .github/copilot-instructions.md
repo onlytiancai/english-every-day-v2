@@ -18,15 +18,16 @@ This project is a Nuxt3 project using TypeScript, Vue3, Prisma, and TailwindCSS.
 
 - use @ant-design/icons-vue and bootstrap 5 if needed
 
-## 数据库结构
+## 访问数据库
 
-参考路径 prisma\schema.prisma
+数据库结构路径 prisma\schema.prisma ，数据库相关的操作可以参考此文档
 
 ## 常用代码
 
 获取当前用户 id
 
-    import { getCurrentUserId } from '../utils/auth';
+    import { getCurrentUserId } from '~/server/utils/auth';
+    const userId = await getCurrentUserId(event);
 
 访问数据库
 

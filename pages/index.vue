@@ -125,7 +125,13 @@ const stats = ref({
 
 const dailyRanking = ref([]);
 const weeklyRanking = ref([]);
-const friends = ref([]);
+const friends = ref<Array<{
+  id: number;
+  name: string;
+  avatar: string;
+  todayCount: number;
+  weekCount: number;
+}>>([]);
 const todayCompleted = ref(false);
 const user = ref(null);
 
@@ -168,7 +174,7 @@ const startLearning = () => {
   navigateTo('/learn');
 };
 
-const likeUser = async (userId: string) => {
+const likeUser = async (userId: number) => {
   const { getAuthHeaders } = await import('~/utils/auth');
   try {
     await $fetch(`/api/users/${userId}/like`, { 
@@ -181,7 +187,7 @@ const likeUser = async (userId: string) => {
   }
 };
 
-const followUser = async (userId: string) => {
+const followUser = async (userId: number) => {
   const { getAuthHeaders } = await import('~/utils/auth');
   try {
     await $fetch(`/api/users/${userId}/follow`, { 
@@ -194,7 +200,7 @@ const followUser = async (userId: string) => {
   }
 };
 
-const unfollowUser = async (userId: string) => {
+const unfollowUser = async (userId: number) => {
   const { getAuthHeaders } = await import('~/utils/auth');
   try {
     await $fetch(`/api/users/${userId}/unfollow`, { 
