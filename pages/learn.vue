@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { handleAuthentication } from '~/utils/auth';
+import { checkAuth } from '~/utils/auth';
 
 const route = useRoute();
 const router = useRouter();
@@ -94,7 +94,7 @@ watch(autoPlayMode, (newValue) => {
 
 // Authentication check
 onMounted(async () => {
-  const { isAuthenticated: authStatus, error } = await handleAuthentication(null);
+  const { isAuthenticated: authStatus, error } = await checkAuth();
   if (!authStatus) {
     await navigateTo('/login');
     return;

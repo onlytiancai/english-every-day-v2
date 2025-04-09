@@ -119,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { handleAuthentication, logout } from '~/utils/auth';
+import { checkAuth, logout } from '~/utils/auth';
 const debugMessages = ref<string[]>([]);
 
 function logDebug(message: string) {
@@ -144,6 +144,15 @@ const friends = ref([]);
 const todayCompleted = ref(false);
 const user = ref(null);
 
+// Add helper function for API error handling
+const handleApiError = async (error: any) => {
+  logDebug(`API Error ${error?.response?.status}: ${error?.message || error}`);
+  if (error?.response?.status === 401) {
+    logDebug('Unauthorized, redirecting to login...');
+    await navigateTo('/login');
+  }
+};
+
 // Fetch initial data
 const fetchData = async () => {
   const { getAuthHeaders } = await import('~/utils/auth');
@@ -165,7 +174,7 @@ const fetchData = async () => {
     friends.value = friendsData;
     todayCompleted.value = statsData.todaySentences > 0;
   } catch (error) {
-    logDebug(`Error fetching data: ${error}`);
+    await handleApiError(error);
   }
 };
 
@@ -176,29 +185,41 @@ const startLearning = () => {
 
 const likeUser = async (userId: string) => {
   const { getAuthHeaders } = await import('~/utils/auth');
-  await $fetch(`/api/users/${userId}/like`, { 
-    method: 'POST',
-    headers: getAuthHeaders()
-  });
-  await fetchData();
+  try {
+    await $fetch(`/api/users/${userId}/like`, { 
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    await fetchData();
+  } catch (error) {
+    await handleApiError(error);
+  }
 };
 
 const followUser = async (userId: string) => {
   const { getAuthHeaders } = await import('~/utils/auth');
-  await $fetch(`/api/users/${userId}/follow`, { 
-    method: 'POST',
-    headers: getAuthHeaders()
-  });
-  await fetchData();
+  try {
+    await $fetch(`/api/users/${userId}/follow`, { 
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    await fetchData();
+  } catch (error) {
+    await handleApiError(error);
+  }
 };
 
 const unfollowUser = async (userId: string) => {
   const { getAuthHeaders } = await import('~/utils/auth');
-  await $fetch(`/api/users/${userId}/unfollow`, { 
-    method: 'POST',
-    headers: getAuthHeaders()
-  });
-  await fetchData();
+  try {
+    await $fetch(`/api/users/${userId}/unfollow`, { 
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    await fetchData();
+  } catch (error) {
+    await handleApiError(error);
+  }
 };
 
 const handleLogout = async () => {
@@ -283,7 +304,7 @@ const handleShare = async () => {
 // Authentication logic
 onMounted(async () => {
   logDebug(`Mounting component...`);
-  const { isAuthenticated: authStatus, error, userInfo } = await handleAuthentication(logDebug);
+  const { isAuthenticated: authStatus, error, userInfo } = await checkAuth(logDebug);
   logDebug(`Authentication status: ${authStatus}, error: ${error}`);
   
   if (!authStatus) {
@@ -339,6 +360,7 @@ onMounted(async () => {
     });
 
   } catch (error) {
+    await handleApiError(error);
     const errorMsg = `微信配置初始化失败: ${error.message || error}`;
     logDebug(errorMsg);
   }

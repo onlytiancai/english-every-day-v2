@@ -12,42 +12,38 @@ export function getWechatLoginUrl() {
   return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${config.public.wechatAppId}&redirect_uri=${redirectUri}&response_type=code&scope=snsapi_userinfo#wechat_redirect`;
 }
 
-export async function handleAuthentication(log) {
-  if (!log) log = console.log
+export function checkAuth(log = console.log): { isAuthenticated: boolean; userInfo?: UserInfo } {
   const token = localStorage.getItem('token');
   const userInfoStr = localStorage.getItem('userInfo');
-  const route = useRoute();
-  const code = route.query.code as string;
-  const config = useRuntimeConfig();
 
-  log(`Handling authentication - token exists: ${!!token}, code: ${code}`);
+  log(`Checking authentication - token exists: ${!!token}`);
 
   if (token && userInfoStr) {
     const userInfo = JSON.parse(userInfoStr);
-    log(`Using existing token for user: ${userInfo.nickname}`);
+    log(`Found existing token for user: ${userInfo.nickname}`);
     return { isAuthenticated: true, userInfo };
   }
 
-  if (code) {
-    log(`Processing WeChat auth code`);
-    try {
-      const data = await $fetch(`/api/wechat-login?code=${code}`);
-      if (data.success) {
-        log(`WeChat login successful for user: ${data.userInfo.nickname}`);
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('userInfo', JSON.stringify(data.userInfo));
-        return { isAuthenticated: true, userInfo: data.userInfo };
-      }
-      log(`WeChat login failed: ${data.error}`);
-      return { isAuthenticated: false, error: data.error };
-    } catch (error) {
-      log(`WeChat login error: ${error}`);
-      return { isAuthenticated: false, error: `WeChat login error: ${error}` };
-    }
-  }
-
-  log('No authentication token or code found');
+  log('No authentication found');
   return { isAuthenticated: false };
+}
+
+export async function loginWithWechat(code: string, log = console.log) {
+  log(`Processing WeChat auth code`);
+  try {
+    const data = await $fetch(`/api/wechat-login?code=${code}`);
+    if (data.success) {
+      log(`WeChat login successful for user: ${data.userInfo.nickname}`);
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userInfo', JSON.stringify(data.userInfo));
+      return { success: true, userInfo: data.userInfo };
+    }
+    log(`WeChat login failed: ${data.error}`);
+    return { success: false, error: data.error };
+  } catch (error) {
+    log(`WeChat login error: ${error}`);
+    return { success: false, error: `WeChat login error: ${error}` };
+  }
 }
 
 export function getAuthHeaders() {

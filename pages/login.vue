@@ -8,19 +8,24 @@
 </template>
 
 <script setup lang="ts">
-import { getWechatLoginUrl, handleAuthentication } from '~/utils/auth';
+import { getWechatLoginUrl, loginWithWechat } from '~/utils/auth';
 
 const router = useRouter();
+const route = useRoute();
 const errorMessage = ref('');
 const loginWechatUrl = ref(getWechatLoginUrl());
 
 onMounted(async () => {
-  const { isAuthenticated: authStatus, error } = await handleAuthentication(console.log);
-  if (authStatus) {
-    await router.push('/');
-  }
-  if (error) {
+  // Check if there's a code in URL
+  const code = route.query.code as string;
+  if (code) {
+    const { success, error, userInfo } = await loginWithWechat(code, console.log);
+    if (success) {
+      await router.push('/');
+      return;
+    }
     errorMessage.value = error;
+    return;
   }
 });
 </script>
