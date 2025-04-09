@@ -1,6 +1,8 @@
 import prisma from '~/lib/prisma';
+import { getCurrentUserId } from '../../utils/auth';
 
 export default defineEventHandler(async (event) => {
+  const userId = await getCurrentUserId(event);
   const type = event.context.params.type;
   
   const today = new Date();
@@ -11,6 +13,22 @@ export default defineEventHandler(async (event) => {
   weekStart.setHours(0, 0, 0, 0);
 
   try {
+    // 获取今日点赞记录
+    const todayLikes = await prisma.dailyLike.findMany({
+      where: {
+        giverId: userId,
+        likedAt: {
+          gte: today
+        }
+      },
+      select: {
+        receiverId: true
+      }
+    });
+
+    // 创建已点赞用户ID集合
+    const likedUserIds = new Set(todayLikes.map(like => like.receiverId));
+
     const where = type === 'daily' 
       ? { learnedAt: { gte: today } }
       : { learnedAt: { gte: weekStart } };
@@ -42,7 +60,8 @@ export default defineEventHandler(async (event) => {
         id: user.id,
         name: user.name,
         avatar: userInfo.headimgurl || '',
-        sentenceCount: user._count.learningRecords
+        sentenceCount: user._count.learningRecords,
+        hasLikedToday: likedUserIds.has(user.id) // 添加点赞状态
       };
     });
 

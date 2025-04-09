@@ -5,7 +5,6 @@
         <div>
           <h6 class="card-subtitle text-muted mb-1">{{ title }}</h6>
           <h3 class="card-title mb-0">{{ value }}</h3>
-          <small v-if="subtitle" class="text-muted">{{ subtitle }}</small>
         </div>
         <component :is="iconComponent" class="fs-4 text-primary" />
       </div>
@@ -21,7 +20,6 @@ import {
 
 const props = defineProps<{
   title: string;
-  subtitle?: string;
   value: number;
   icon: string;
 }>();

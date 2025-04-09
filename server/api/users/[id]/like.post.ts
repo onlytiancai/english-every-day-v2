@@ -8,7 +8,25 @@ export default defineEventHandler(async (event) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Create like record for today
+    // 检查今天是否已经点过赞
+    const existingLike = await prisma.dailyLike.findFirst({
+      where: {
+        giverId,
+        receiverId,
+        likedAt: {
+          gte: today
+        }
+      }
+    });
+
+    if (existingLike) {
+      throw createError({
+        statusCode: 400,
+        message: 'You have already liked this user today',
+      });
+    }
+
+    // 创建点赞记录
     await prisma.dailyLike.create({
       data: {
         giverId,
@@ -19,11 +37,8 @@ export default defineEventHandler(async (event) => {
 
     return { success: true };
   } catch (error) {
-    if (error.code === 'P2002') {
-      throw createError({
-        statusCode: 400,
-        message: 'You have already liked this user today',
-      });
+    if (error.statusCode === 400) {
+      throw error;
     }
     throw createError({
       statusCode: 500,

@@ -18,6 +18,22 @@ export default defineEventHandler(async (event) => {
     weekStart: weekStart.toISOString()
   });
 
+  // 获取今日点赞记录
+  const todayLikes = await prisma.dailyLike.findMany({
+    where: {
+      giverId: userId,
+      likedAt: {
+        gte: today
+      }
+    },
+    select: {
+      receiverId: true
+    }
+  });
+
+  // 创建已点赞用户ID集合
+  const likedUserIds = new Set(todayLikes.map(like => like.receiverId));
+
   // 获取关注的用户列表及其学习记录
   const friends = await prisma.follow.findMany({
     where: {
@@ -63,7 +79,8 @@ export default defineEventHandler(async (event) => {
       avatar: userInfo.headimgurl || '',
       todayCount,
       weekCount,
-      isFollowing: true
+      isFollowing: true,
+      hasLikedToday: likedUserIds.has(following.id) // 添加点赞状态
     };
   });
 

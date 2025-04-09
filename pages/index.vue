@@ -18,8 +18,7 @@
           <img v-if="user?.avatar" :src="user.avatar" class="rounded-circle border shadow-sm me-3" width="64"
             height="64" :alt="user?.name">
           <div>
-            <h2 class="h6 mb-1">欢迎回来，{{ user?.name || '同学' }}</h2>
-            <p class="text-muted mb-0">让我们继续今天的学习吧！</p>
+            <h2 class="h6 mb-1">欢迎回来，<br>{{ user?.name || '同学' }}</h2>
           </div>
         </div>
         <div class="d-flex flex-column flex-sm-row gap-2">
@@ -43,17 +42,17 @@
 
     <!-- Dashboard Stats -->
     <div class="row g-2 mb-4">
-      <div class="col-3 col-lg-3">
-        <DashboardCard title="今日" subtitle="句子" :value="stats.todaySentences" icon="FileTextOutlined" />
+      <div class="col-6 col-lg-3">
+        <DashboardCard title="今日"  :value="stats.todaySentences" icon="FileTextOutlined" />
       </div>
-      <div class="col-3 col-lg-3">
-        <DashboardCard title="本周" subtitle="句子" :value="stats.weekSentences" icon="FileTextOutlined" />
+      <div class="col-6 col-lg-3">
+        <DashboardCard title="本周"  :value="stats.weekSentences" icon="FileTextOutlined" />
       </div>
-      <div class="col-3 col-lg-3">
-        <DashboardCard title="今日" subtitle="获赞" :value="stats.todayLikes" icon="HeartOutlined" />
+      <div class="col-6 col-lg-3">
+        <DashboardCard title="今日"  :value="stats.todayLikes" icon="HeartOutlined" />
       </div>
-      <div class="col-3 col-lg-3">
-        <DashboardCard title="本周" subtitle="获赞" :value="stats.weekLikes" icon="HeartOutlined" />
+      <div class="col-6 col-lg-3">
+        <DashboardCard title="本周"  :value="stats.weekLikes" icon="HeartOutlined" />
       </div>
     </div>
 
@@ -69,14 +68,17 @@
               <div class="d-flex align-items-center p-2 border rounded">
                 <img :src="friend.avatar" class="rounded-circle me-3" width="48" height="48" :alt="friend.name">
                 <div class="flex-grow-1">
-                  <h6 class="mb-0">{{ friend.name }}</h6>
+                  <h6 class="mb-0">{{ friend.name }} {{friend.hasLikedToday?'AAA':'BBB'}}</h6>
                   <small class="text-muted">
                     今日: {{ friend.todayCount }}句 / 本周: {{ friend.weekCount }}句
                   </small>
                 </div>
                 <div class="d-flex gap-2">
-                  <button @click="likeUser(friend.id)" class="btn btn-outline-danger btn-sm">
-                    <HeartOutlined />
+                  
+                  <button @click="likeUser(friend.id)" 
+                          class="btn btn-outline-danger btn-sm">
+                    <HeartOutlined v-if="!friend.hasLikedToday" />
+                    <HeartFilled v-else />
                   </button>
                   <button @click="unfollowUser(friend.id)" class="btn btn-outline-secondary btn-sm">
                     <UserDeleteOutlined />
@@ -122,7 +124,8 @@
 </template>
 
 <script setup lang="ts">
-import { LogoutOutlined } from '@ant-design/icons-vue';
+import { LogoutOutlined, HeartOutlined, HeartFilled } from '@ant-design/icons-vue';
+import confetti from 'canvas-confetti';
 import { checkAuth, logout } from '~/utils/auth';
 const { debugMessages, logDebug, clearDebugMessages } = useDebugLog();
 
@@ -143,6 +146,7 @@ const friends = ref<Array<{
   avatar: string;
   todayCount: number;
   weekCount: number;
+  hasLikedToday: boolean;
 }>>([]);
 const todayCompleted = ref(false);
 const user = ref(null);
@@ -158,6 +162,28 @@ const handleApiError = async (error: any) => {
     logDebug('Unauthorized, redirecting to login...');
     await navigateTo('/login');
   }
+};
+
+// Toast initialization
+const initToast = () => {
+  if (process.client) {
+    const Toast = (window as any).bootstrap?.Toast;
+    const toastEl = document.getElementById('shareToast');
+    if (Toast && toastEl) {
+      toast = new Toast(toastEl, {
+        delay: 3000
+      });
+    }
+  }
+};
+
+const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+  toastMessage.value = message;
+  toastType.value = type;
+  initToast(); // 每次显示时都重新初始化
+  nextTick(() => {
+    toast?.show();
+  });
 };
 
 // Fetch initial data
@@ -193,13 +219,28 @@ const startLearning = () => {
 const likeUser = async (userId: number) => {
   const { getAuthHeaders } = await import('~/utils/auth');
   try {
-    await $fetch(`/api/users/${userId}/like`, { 
+    const response = await $fetch(`/api/users/${userId}/like`, { 
       method: 'POST',
       headers: getAuthHeaders()
     });
+    
+    if (response.success) {
+      // 播放撒花动画
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ff0000', '#ff69b4', '#ff1493']
+      });
+    }
+    
     await fetchData();
   } catch (error) {
-    await handleApiError(error);
+    if (error?.response?.status === 400) {
+      showToast('今天已经给这位好友点过赞啦！', 'error');
+    } else {
+      await handleApiError(error);
+    }
   }
 };
 
@@ -235,12 +276,6 @@ const handleLogout = async () => {
   isAuthenticated.value = false;
   user.value = null;
   await navigateTo('/login');
-};
-
-const showToast = (message: string, type: 'success' | 'error' = 'success') => {
-  toastMessage.value = message;
-  toastType.value = type;
-  toast?.show();
 };
 
 const handleShare = async () => {
@@ -379,7 +414,9 @@ onMounted(async () => {
     logDebug(errorMsg);
   }
 
-  toast = new bootstrap.Toast(document.getElementById('shareToast'));
+  nextTick(() => {
+    initToast();
+  });
 });
 </script>
 

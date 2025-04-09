@@ -14,7 +14,8 @@
       <div class="d-flex gap-2">
         <button @click="$emit('like', user.id)" 
                 class="btn btn-outline-danger btn-sm">
-          <HeartOutlined />
+          <HeartOutlined v-if="!user.hasLikedToday" />
+          <HeartFilled v-else />
         </button>
         <button @click="$emit('follow', user.id)" 
                 class="btn btn-outline-primary btn-sm">
@@ -26,11 +27,14 @@
 </template>
 
 <script setup lang="ts">
+import { HeartOutlined, HeartFilled } from '@ant-design/icons-vue';
+
 interface User {
-  id: number;  // Change type from string to number
+  id: number;
   name: string;
   avatar: string;
   sentenceCount: number;
+  hasLikedToday: boolean;
 }
 
 defineProps<{
@@ -38,7 +42,7 @@ defineProps<{
 }>();
 
 defineEmits<{
-  (e: 'like', userId: number): void;  // Change type from string to number
-  (e: 'follow', userId: number): void;  // Change type from string to number
+  (e: 'like', userId: number): void;
+  (e: 'follow', userId: number): void;
 }>();
 </script>
